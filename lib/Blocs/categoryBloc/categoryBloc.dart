@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryEvents.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryState.dart';
 import 'package:flutter_shop/Models/categoriesModel.dart';
-import 'package:flutter_shop/Providers/brandsProvider.dart';
+import 'package:flutter_shop/Providers/dataProvider.dart';
 import 'package:flutter_shop/Repository/fetchDataRepo.dart';
 import 'package:provider/provider.dart';
 

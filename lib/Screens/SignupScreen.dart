@@ -1,3 +1,214 @@
+/*import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter_shop/Utlis/myColors.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
+
+class showAddPhotoPanel extends StatefulWidget {
+  @override
+  _showAddPhotoPanelState createState() => _showAddPhotoPanelState();
+}
+
+class _showAddPhotoPanelState extends State<showAddPhotoPanel> {
+  List<Widget> imgs = [];
+  List<File> pics = [];
+  File img;
+  File _image;
+  final picker = ImagePicker();
+
+  Future<void> getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+        setState (()=> img = File(pickedFile.path));
+        return imageDialog(context);
+      }  else {
+        print('No image selected.');
+      }
+  }
+
+  upload(File imageFile) async {
+    // open a bytestream
+    var stream =
+    new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    // get file length
+    var length = await imageFile.length();
+
+    // string to uri
+    var uri = Uri.parse("/uploads");
+
+    // create multipart request
+    var request = new http.MultipartRequest("POST", uri);
+
+    // multipart that takes file
+    var multipartFile = new http.MultipartFile('myFile', stream, length, filename: imageFile.path.split('/').last);
+
+    // add file to multipart
+    request.files.add(multipartFile);
+
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+    // listen for response
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+  }
+
+  Future getImage2 () async {
+    var result = await ImageP().getImage(source: ImageSource.gallery);
+    setState (()=> img = File(result.path));
+    return imageDialog(context);
+  }
+
+  Future imageDialog (BuildContext context) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: Text('Upload Image'),
+            content: Container (
+              width: 180,
+              height: 180,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                    width: 80,
+                    height: 80,
+                    child: Image.file(img, width: 150, height: 150,)),
+              )
+            ),
+            actions: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  ElevatedButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                     setState(() {
+                       pics.add(img);
+                       imgs.add( Image.file(img, width: 130, height: 150,));
+                     });
+                    },
+                  ),
+                  SizedBox(width: 20,),
+                  ElevatedButton(
+                    child: Text('Cancel'),
+                    onPressed: (){
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              )
+            ],
+          );
+        }
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 15),
+      width: MediaQuery.of(context).size.width,
+      height: 350,
+      child: imgs.isEmpty  ? Center(
+        child: Container(
+          height: 55,
+          width: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: myColors.dustyOrange,
+          ),
+          child: TextButton(
+            child: Text('Get Photos', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+            onPressed: (){
+              getImage();
+            },
+          ),
+        ),
+      ): SingleChildScrollView(
+        child: Column(
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                 Container(
+                    height: 170,
+                    width: MediaQuery.of(context).size.width-50,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                        itemCount: imgs.length,
+                        itemBuilder: (context, i) {
+                        return Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: Container(
+                              child: Row(
+                                children: [
+                                  imgs[i]!= null? imgs[i] : CircularProgressIndicator() ,
+                                  i >= imgs.length-1 ? Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: DottedBorder(
+                                      dashPattern: [6, 2],
+                                      strokeWidth: 1.5,
+                                      child: Container(
+                                          width: 110,
+                                          height: 170,
+                                          child: GestureDetector(
+                                            onTap: (){
+                                              getImage();
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.add_photo_alternate),
+                                                SizedBox(height: 5,),
+                                                Text('Add more photos', style: TextStyle(fontWeight: FontWeight.bold, ), textAlign: TextAlign.center,),
+                                              ],
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                  ):SizedBox()
+                                ],
+                              )
+                          )
+                        );
+                        }
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 15,),
+            imgs.length>0 ?
+            Container(
+              height: 50,
+              width: 110,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: myColors.dustyOrange,
+              ),
+              child: TextButton(
+                child: Text('Upload', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                onPressed: ()async {
+                  Navigator.pop(context, pics);
+                },
+              ),
+            ) : Container()
+          ],
+        ),
+      ),
+    );
+  }
+  }
+ */
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,7 +243,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState (){
     authBloc = BlocProvider.of<AuthBloc>(context);
-   // loginBloc = LoginBloc(repo: repo, authBloc: authBloc);
+    // loginBloc = LoginBloc(repo: repo, authBloc: authBloc);
     super.initState();
   }
   @override
@@ -335,7 +546,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       setState(() {
                         isAsync = true;
                       });
-                    //  authBloc.add(signUpButtonPressed(userEmail: userEmail, userPassword: userPassword, userName: userFirstName+ ' ' +userLastName, userPhone: '09090909090', userType: 0));
+                      //  authBloc.add(signUpButtonPressed(userEmail: userEmail, userPassword: userPassword, userName: userFirstName+ ' ' +userLastName, userPhone: '09090909090', userType: 0));
                     }
                   }
                   ),
@@ -355,40 +566,39 @@ class _SignUpPageState extends State<SignUpPage> {
     }
     return Scaffold(
 
-      body: BlocListener<AuthBloc, AuthStates>(
-        bloc: authBloc,
-        listener: (context, state){
-          if (state is AuthError) {
-            onWidgetDidBuild(() {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${state.msg}'),
-                    backgroundColor: Colors.red,)
-              );
-            });
-          } else if (state is AuthAuthenticated){
-            onWidgetDidBuild(()  {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Signed up'),
-                    backgroundColor: Colors.red,)
-              );
-            });
-            Future.delayed(Duration(seconds: 2));
-            Navigator.pushReplacementNamed(context, '/navigator', arguments: state.user);
-          }
-        },
-        child: progressInd(
-          child: Form(
-            key: formKey,
-            child: signUpForm(context),
+        body: BlocListener<AuthBloc, AuthStates>(
+          bloc: authBloc,
+          listener: (context, state){
+            if (state is AuthError) {
+              onWidgetDidBuild(() {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${state.msg}'),
+                      backgroundColor: Colors.red,)
+                );
+              });
+            } else if (state is AuthAuthenticated){
+              onWidgetDidBuild(()  {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Signed up'),
+                      backgroundColor: Colors.red,)
+                );
+              });
+              Future.delayed(Duration(seconds: 2));
+              Navigator.pushReplacementNamed(context, '/navigator', arguments: state.user);
+            }
+          },
+          child: progressInd(
+            child: Form(
+              key: formKey,
+              child: signUpForm(context),
+            ),
+            isAsync: isAsync,
+            opacity: 0.3,
           ),
-          isAsync: isAsync,
-          opacity: 0.3,
-        ),
-      )
+        )
     );
 
   }
 }
-

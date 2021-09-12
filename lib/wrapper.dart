@@ -4,6 +4,9 @@ import 'package:flutter_shop/Blocs/authBloc/authBloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
 import 'package:flutter_shop/Blocs/authBloc/authState.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
+import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
+import 'package:flutter_shop/Blocs/productBloc/productEvents.dart';
+import 'package:flutter_shop/Blocs/productBloc/productState.dart';
 import 'package:flutter_shop/Repository/authRepository.dart';
 import 'package:flutter_shop/Repository/fetchDataRepo.dart';
 import 'package:flutter_shop/Screens/LoginScreen.dart';
@@ -12,6 +15,7 @@ import 'package:flutter_shop/Screens/SignupScreen.dart';
 import 'package:flutter_shop/Screens/SplashScreen.dart';
 import 'Blocs/categoryBloc/categoryEvents.dart';
 import 'Blocs/categoryBloc/categoryState.dart';
+import 'Blocs/productBloc/productState.dart';
 
 
 class wrapper extends StatefulWidget {
@@ -31,6 +35,8 @@ class _wrapperState extends State<wrapper> {
   AuthStates states;
   CategoriesBloc categoriesBloc;
   CategoryState categoryState;
+  productBloc ProductsBloc;
+  productState ProductState;
 
   @override
   void initState() {
@@ -38,6 +44,8 @@ class _wrapperState extends State<wrapper> {
     authBloc.add(AppStarted(context: context));
     categoriesBloc = CategoriesBloc(categoryState, fetchRepo);
     categoriesBloc.add(categoriesInit(context: context));
+    ProductsBloc = productBloc(ProductState, fetchRepo);
+    ProductsBloc.add(initEvent(context: context));
     super.initState();
   }
   @override

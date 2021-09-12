@@ -5,7 +5,9 @@ import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
 import 'package:flutter_shop/Blocs/authBloc/authState.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryState.dart';
-import 'package:flutter_shop/Providers/brandsProvider.dart';
+import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
+import 'package:flutter_shop/Blocs/productBloc/productState.dart';
+import 'package:flutter_shop/Providers/dataProvider.dart';
 import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Repository/authRepository.dart';
 import 'package:flutter_shop/Repository/fetchDataRepo.dart';
@@ -61,12 +63,14 @@ void dispose (){
         create: (BuildContext context)=> AuthBloc(AuthUninitialized(), AuthRepository())),
        BlocProvider<CategoriesBloc>(
            create: (BuildContext context)=> CategoriesBloc(fetchCategoriesInitialize(), fetchDataRepository())),
+       BlocProvider<productBloc>(
+           create: (BuildContext context)=> productBloc(initialState(), fetchDataRepository())),
      ],
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<userProvider>.value(value: userProvider()),
           ChangeNotifierProvider(create: (_) => categoriesProvider(),),
-         // ChangeNotifierProvider(create: (_) => productsProvider(),),
+          ChangeNotifierProvider(create: (_) => productsProvider(),),
         ],
         child: MaterialApp(
           routes: {

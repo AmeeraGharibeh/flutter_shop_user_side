@@ -1,10 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/productBloc/productEvents.dart';
 import 'package:flutter_shop/Blocs/productBloc/productState.dart';
-import 'package:flutter_shop/Repository/productsRepository.dart';
+import 'package:flutter_shop/Models/productModel.dart';
+import 'package:flutter_shop/Providers/dataProvider.dart';
+import 'package:flutter_shop/Repository/fetchDataRepo.dart';
+import 'package:provider/provider.dart';
 
 class productBloc extends Bloc<productEvents, productState> {
-  productsRepository repo;
+  fetchDataRepository repo;
   productBloc(productState initialState, this.repo) : super(initialState);
 
   @override
@@ -12,10 +15,14 @@ class productBloc extends Bloc<productEvents, productState> {
     if (event is initEvent) {
       yield loadingState();
       try{
-        var allProducts = await repo.fetchProducts();
-        yield fetchIsDone(products: allProducts);
+        List<productsModel> productsList = await repo.fetchProducts();
+        print('data from product bloc : ' + productsList.first.productName);
+        var provider = Provider.of<productsProvider>(event.context, listen: false);
+        provider.setData(productsList);
+        yield fetchIsDone();
       }catch(err) {
-        yield errorState(message: err.toString());
+        yield errorState(msg: err.toString());
+        print('error from fetch data ' +err.toString());
       }
     }
   }

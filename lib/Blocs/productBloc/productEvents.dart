@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 class productEvents extends Equatable {
   @override
@@ -6,4 +7,8 @@ class productEvents extends Equatable {
 
 }
 
-class initEvent extends productEvents {}
+class initEvent extends productEvents {
+  BuildContext context;
+  initEvent({this.context});
+
+}

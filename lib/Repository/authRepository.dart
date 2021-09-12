@@ -12,7 +12,7 @@ class AuthRepository {
     SharedPreferences sharedPref3 = await SharedPreferences.getInstance();
 
     var body = json.encode({'userEmail': userEmail, 'userPassword': userPassword});
-    var response = await http.post('http://192.168.1.35:4000/auth/login',
+    var response = await http.post('http://192.168.1.39:4000/auth/login',
     headers:<String, String> {
       'Content-Type': 'application/json; charset-utf=8',
       'Accept': 'application/json',
@@ -47,7 +47,7 @@ class AuthRepository {
   Future<userModel> signUp (String userName, String userEmail, String userPassword, String userPhone, int userType) async{
     SharedPreferences sharedPref = await SharedPreferences.getInstance();
     var body = json.encode({'userEmail': userEmail, 'userPassword': userPassword, 'userName': userName, 'userPhone': userPhone, 'userType': userType,});
-    var response = await http.post('http://192.168.1.35:4000/auth/signup',
+    var response = await http.post('http://192.168.1.39:4000/auth/signup',
         headers:<String, String> {
           'Content-Type': 'application/json; charset-utf=8',
           'Accept': 'application/json',}, body: body);

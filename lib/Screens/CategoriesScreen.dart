@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryState.dart';
 import 'package:flutter_shop/Models/categoriesModel.dart';
-import 'package:flutter_shop/Providers/brandsProvider.dart';
+import 'package:flutter_shop/Providers/dataProvider.dart';
 import 'package:flutter_shop/Repository/fetchDataRepo.dart';
 import 'package:flutter_shop/Screens/ProductsListScreen.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
@@ -74,56 +74,49 @@ Widget categorySections(){
 }
 
     Widget categoriesList () {
-     // List<String> ind = ['Shoes', 'Bags', 'Accessorises', 'Dresses', 'T-Shirts', 'Beauty', 'Skin Care'];
-
       return  Consumer<categoriesProvider>(
         builder: (context, provider, child){
           List<categoriesModel> categoriesList = provider.getData();
+          List<Color> listItemsColors = [
+            myColors.dustyOrange, myColors.lightPink, myColors.lightOrange, myColors.lightAmber];
           return Stack(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20,),
+                padding: EdgeInsets.only( left: 5, right: 5, bottom: 10),
                 width: MediaQuery.of(context).size.width,
-                height: 300,
-                child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 150,
-                        mainAxisSpacing: 10,
-                        mainAxisExtent: 55,
-                        crossAxisSpacing: 10
-                    ),
-                    itemCount: categoriesList.length,
-                    itemBuilder: (context, i) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          FittedBox(
-                            child: Container(
-                              // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black54, width: 0.7),
-                                borderRadius: BorderRadius.all(Radius.circular(30)),
-                              ),
-                              child: GestureDetector(
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsListPage()));
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(categoriesList[i].categoryName, style: TextStyle(fontSize: 10),), Icon(Icons.arrow_drop_down)],
-                                  ),
-                                ),
-                              ),
+                height: MediaQuery.of(context).size.height,
+                child: ListView.builder(
+                  itemCount: categoriesList.length,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, i) {
+                    return  Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 90,
+                         padding: EdgeInsets.symmetric(horizontal: 10),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                          color: listItemsColors[i % 4].withOpacity(0.2)
+                        ),
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsListPage()));
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(categoriesList[i].categoryName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black54),), Icon(Icons.arrow_drop_down)],
                             ),
                           ),
-                        ],
-                      );
-                    }
-                ),
+                        ),
+                      ),
+                    );
+                  },
+                )
               ),
             ],
           );
@@ -143,7 +136,7 @@ Widget categorySections(){
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: MediaQuery.of(context).size.width-25,
+                  width: MediaQuery.of(context).size.width,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -209,31 +202,9 @@ Widget categorySections(){
                 Center(
                   child: Text('Go ahead! Choose Your Favorite Category', style: TextStyle(fontWeight: FontWeight.w400, color: Colors.black54, fontSize: 15),),
                 ),
-                SizedBox(height: 30,),
+               // SizedBox(height: 10,),
               Container(
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 7),
                   child: categoriesList()),
-                SizedBox(height: 15,),
-                Padding(
-                  padding: EdgeInsets.symmetric( horizontal: 35),
-                  child: Container(
-                    padding: EdgeInsets.symmetric( vertical: 15),
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                      gradient: LinearGradient(
-                          colors: [
-                            myColors.lightPink,
-                            myColors.dustyOrange,
-                          ]
-                      ),
-                    ),
-                    child: Center(
-                      child: Text('Continue', style: TextStyle(color: myColors.deepPurple, fontSize : 20,fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                )
               ],
             ),
           ),
