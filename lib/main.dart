@@ -3,10 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authBloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
 import 'package:flutter_shop/Blocs/authBloc/authState.dart';
+import 'package:flutter_shop/Blocs/brandBloc/brandBloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryState.dart';
+import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
+import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
 import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
 import 'package:flutter_shop/Blocs/productBloc/productState.dart';
+import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProvider.dart';
 import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Repository/authRepository.dart';
@@ -16,6 +20,8 @@ import 'package:flutter_shop/Screens/NavigatorPage.dart';
 import 'package:flutter_shop/Screens/SignupScreen.dart';
 import 'package:flutter_shop/wrapper.dart';
 import 'package:provider/provider.dart';
+
+import 'Blocs/brandBloc/brandState.dart';
 
 
 void main() {
@@ -44,7 +50,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     authBloc = AuthBloc(states,repo);
-    authBloc.add(AppStarted());
+    authBloc.add(AppStarted(context: context));
     categoriesBloc = CategoriesBloc(categoryState, fetchRepo);
     super.initState();
   }
@@ -57,6 +63,7 @@ void dispose (){
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = userModel();
     return MultiBlocProvider(
      providers: [
        BlocProvider<AuthBloc>(
@@ -65,12 +72,21 @@ void dispose (){
            create: (BuildContext context)=> CategoriesBloc(fetchCategoriesInitialize(), fetchDataRepository())),
        BlocProvider<productBloc>(
            create: (BuildContext context)=> productBloc(initialState(), fetchDataRepository())),
+       BlocProvider<BrandBloc>(
+           create: (BuildContext context)=> BrandBloc(fetchBrandInitialize(), fetchDataRepository())),
+       BlocProvider<FavoritesBloc>(
+           create: (BuildContext context)=> FavoritesBloc(fetchFavoritesInitialize(), fetchDataRepository())),
      ],
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider<userProvider>.value(value: userProvider()),
+         // ChangeNotifierProvider<userModel>.value(value: currentUser),
+          ChangeNotifierProvider(create: (_) => userProvider(),),
           ChangeNotifierProvider(create: (_) => categoriesProvider(),),
           ChangeNotifierProvider(create: (_) => productsProvider(),),
+          ChangeNotifierProvider(create: (_) => brandProvider(),),
+          ChangeNotifierProvider(create: (_) => favoritesProvider(),),
+
+
         ],
         child: MaterialApp(
           routes: {

@@ -22,8 +22,8 @@ class productsModel {
     productName = json['productName'];
     productPic = json['productPic'];
     productDescription = json['productDescription'];
-    productCategory = json['ProductCategory'];
-    productBrand = json['ProductBrand'];
+    productCategory = json['productCategory'];
+    productBrand = json['productBrand'];
     productQuantity = json['productQuantity'];
     productPrice = json['productPrice'];
     // _saleable = snapshot.data['isSaleable'];

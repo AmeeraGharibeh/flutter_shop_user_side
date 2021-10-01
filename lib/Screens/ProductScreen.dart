@@ -3,9 +3,14 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
+import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
+import 'package:flutter_shop/Blocs/favoritesBloc/favoritesEvents.dart';
+import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
+import 'package:flutter_shop/Models/favoritesModel.dart';
 import 'package:flutter_shop/Models/productModel.dart';
+import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProvider.dart';
+import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Screens/CartScreen.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
@@ -50,16 +55,19 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
   int selectedIndex;
   TabController _controller;
   PageController pageController = new PageController(initialPage: 0);
-  productBloc ProductBloc;
   int currentPage;
   bool isFavorite = false;
-
+  FavoritesBloc favoritesBloc;
+  userModel user;
+  List<favoritesModel> fav;
 
   @override
   void initState() {
     super.initState();
     _controller = new TabController(length: 2, vsync: this);
-    ProductBloc = BlocProvider.of<productBloc>(context);
+    favoritesBloc = BlocProvider.of<FavoritesBloc>(context);
+
+
   }
 
   @override
@@ -77,11 +85,11 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
               Tab(child: Text('Details', style: TextStyle(fontSize: 16),),),
               Tab(child: Text('Review', style: TextStyle(fontSize: 16),),),
             ]
-
         ),
       );
     }
-    Widget productDetailsUI(BuildContext context) {
+    Widget productDetailsUI(BuildContext context, userModel user, favoritesProvider favProvider) {
+
       return Consumer<productsProvider>(
           builder: (context, provider, child) {
             productsModel productData = provider.getDataById(productId);
@@ -95,6 +103,8 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
             for (var singleColor in productData.productColors) {
               colors.add(colorItem.fromJson(json.decode(singleColor)));
             }
+            List<favoritesModel> favList = [];
+            favList = favProvider.getUserFavs(productData.productId, user.userId);
 
             return Stack(
               children: [
@@ -164,9 +174,16 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                         setState(() {
                                           isFavorite = !isFavorite;
                                         });
+
+                                        if(isFavorite == true && favProvider.getUserFavs(productData.productId, user.userId).isEmpty) {
+                                          favoritesBloc.add(addToFavoritesButtonPressed(userId: user.userId, productId: productData.productId, context: context));
+                                        } else {
+                                        // remove event
+                                        }
+
                                       },
                                       child: Icon(
-                                        isFavorite ? Icons.favorite : Icons
+                                      isFavorite || favProvider.isFavoriteByUser(productData.productId, user.userId) == true ? Icons.favorite : Icons
                                             .favorite_border,
                                         color: Colors.redAccent,),
                                     )
@@ -293,10 +310,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                     ),
                                   ),
                                     Container(
-                                      width: MediaQuery
-                                          .of(context)
-                                          .size
-                                          .width,
+                                      width: MediaQuery.of(context).size.width,
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment
                                             .start,
@@ -304,25 +318,21 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                           myTabs(),
                                           Container(
                                             height: 200,
-                                            width: MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width,
+                                            width: MediaQuery.of(context).size.width,
                                             child: TabBarView(
                                               controller: _controller,
                                               children: [
                                                 Container(
                                                   width: MediaQuery.of(context).size.width,
                                                   child: Center(
-                                                    child: Text( 'llll'//productData.productDescription
+                                                    child: Text( 'productData.productDescription'//productData.productDescription
                                                     ),
                                                   ),
                                                 ),
                                                 Container(
                                                   width: MediaQuery.of(context).size.width,
                                                   child: Center(
-                                                    child: Text(
-                                                        'Review page here'),
+                                                    child: Text('Review page here'),
                                                   ),
                                                 ),
                                               ],
@@ -337,7 +347,6 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                           ),
                         ],
                       ),
-
                     ],
                   ),
                 ),
@@ -346,10 +355,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 35),
                       child: Container(
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
+                        width: MediaQuery.of(context).size.width,
                         height: 50,
                         child: Row(
                           children: [
@@ -363,15 +369,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                 ),
                                 child: GestureDetector(
                                   onTap: () {
-                                    /*     userServices().adToCart({
-                                    'productName': productData.productName,
-                                    'productDetails': productData
-                                        .productDescription,
-                                    'productPrice': productData.productPrice,
-                                    'productPics': productData.productPic,
-                                    'productSize': selectedSize,
-                                    'Quantity': quantity
-                                  });*/
+
                                   },
                                   child: Icon(Icons.add_shopping_cart,
                                       color: myColors.deepPurple),
@@ -386,10 +384,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 15),
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width - 150,
+                                width: MediaQuery.of(context).size.width - 150,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.all(
                                       Radius.circular(30)),
@@ -422,11 +417,14 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
     }
 
 
+    var provider = Provider.of<userProvider>(context, listen: false);
+    user = provider.getData();
+    var favProvider = Provider.of<favoritesProvider>(context, listen: false);
 
     return progressInd(
       child: Scaffold(
         backgroundColor: myColors.backGroundShade,
-        body: productDetailsUI(context),
+        body: productDetailsUI(context, user, favProvider),
       ),
       isAsync: isAsync,
       opacity: 0.3,

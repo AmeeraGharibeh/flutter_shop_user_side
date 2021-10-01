@@ -17,19 +17,26 @@ import 'package:shared_preferences/shared_preferences.dart';
    SharedPreferences pref = await SharedPreferences.getInstance();
    SharedPreferences sharedPref = await SharedPreferences.getInstance();
    SharedPreferences sharedPref2 = await SharedPreferences.getInstance();
-
+   if (event is AppInitialize) {
+    yield AuthUninitialized();
+   }
 
    if (event is AppStarted) {
-    var token = pref.getString('token');
-    var email = sharedPref.getString('userEmail');
-    var pass = sharedPref2.getString('userPassword');
-    if (token != null && email != null && pass != null  ) {
-     userModel myUser = await repo.login(email, '2222');
-     var provider = Provider.of<userProvider>(event.context, listen: false);
-     provider.setData(myUser);
-     yield AuthAuthenticated(user: myUser);
-    } else {
-     yield AuthUnAuthenticated();
+    yield AuthLoading();
+    try{
+     var token = pref.getString('token');
+     var email = sharedPref.getString('userEmail');
+     var pass = sharedPref2.getString('userPassword');
+     if (token != null && email != null && pass != null  ) {
+      userModel myUser = await repo.login(email, '2222');
+      var provider = Provider.of<userProvider>(event.context, listen: false);
+      provider.setData(myUser);
+      yield AuthAuthenticated(user: myUser);
+     } else {
+      yield AuthUnAuthenticated();
+     }
+    }catch(err) {
+     print('error from try catch block in AuthBloc' + err);
     }
    }
    if (event is loginButtonPressed) {

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shop/Screens/paymentPage.dart';
-import 'package:flutter_shop/Services/DatabaseServices.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
 
@@ -227,180 +226,176 @@ class _cartPageState extends State<cartPage> {
     }
 
     Widget cartPageUI(BuildContext context) {
-      return StreamBuilder(
-          stream: stream,
-          builder: (context, snapshot) {
-            return Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: SingleChildScrollView(
+      return Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - 170,
+                    child: ListView.builder(
+                        itemCount: 2,
+                        itemBuilder: (BuildContext context, i) {
+                          return inCartProducts('productData.productPic[0]', 'kkkkk',
+                              'mmmmmmmm',
+                              330);
+                        }),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(
+                        top: 35, left: 20, right: 20, bottom: 10),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.50,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(25),
+                            topLeft: Radius.circular(25))),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height - 170,
-                          child: ListView.builder(
-                              itemCount: 2,
-                              itemBuilder: (BuildContext context, i) {
-                                return inCartProducts('productData.productPic[0]', 'kkkkk',
-                                    'mmmmmmmm',
-                                   330);
-                              }),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Purches: ',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              '\$330',
+                              style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
-                        Container(
-                          padding: EdgeInsets.only(
-                              top: 35, left: 20, right: 20, bottom: 10),
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * 0.50,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(25),
-                                  topLeft: Radius.circular(25))),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Purches: ',
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    '\$330',
-                                    style: TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 7,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Discount: ',
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    '\$100',
-                                    style: TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 7,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Shiiping Fees: ',
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    '\$9.99',
-                                    style: TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 7,
-                              ),
-                              Divider(
-                                thickness: 0.7,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(
-                                height: 7,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Total: ',
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    '\$239.99',
-                                    style: TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Discount: ',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              '\$100',
+                              style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Shiiping Fees: ',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              '\$9.99',
+                              style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Divider(
+                          thickness: 0.7,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total: ',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              '\$239.99',
+                              style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ),
-                Positioned(
-                    bottom: 30,
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 45),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => paymentPage()));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            width: MediaQuery.of(context).size.width - 100,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [
-                                myColors.lightPink,
-                                myColors.dustyOrange,
-                              ]),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
-                            ),
-                            child: Center(
-                                child: Text(
-                              'Check Out Now',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            )),
-                          ),
-                        )))
-              ],
-            );
-          });
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+              bottom: 30,
+              child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 45),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => paymentPage()));
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      width: MediaQuery.of(context).size.width - 100,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [
+                          myColors.lightPink,
+                          myColors.dustyOrange,
+                        ]),
+                        borderRadius:
+                        BorderRadius.all(Radius.circular(30)),
+                      ),
+                      child: Center(
+                          child: Text(
+                            'Check Out Now',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          )),
+                    ),
+                  )))
+        ],
+      );
     }
 
     return progressInd(

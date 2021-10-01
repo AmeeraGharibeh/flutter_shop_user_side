@@ -1,7 +1,9 @@
 
+import 'package:flutter/cupertino.dart';
+
 class userModel  {
 
-  //String userId ;
+  String userId ;
   String userName;
   String userEmail;
   String userPassword;
@@ -9,10 +11,9 @@ class userModel  {
   int userType;
   String userToken;
   userModel({this.userName, this.userEmail, this.userPassword, this.userPhone, this.userType, this.userToken});
-  //userModel({this.userEmail, this.userPassword, this.userToken});
 
   userModel.fromMap (Map<String, dynamic> json) {
-   // userId = json['userId'];
+    userId = json['_id'];
     userName = json['userName'];
     userEmail = json['userEmail'];
     userPassword = json['userPassword'];

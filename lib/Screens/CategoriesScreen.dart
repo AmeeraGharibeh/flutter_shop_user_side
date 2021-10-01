@@ -102,7 +102,7 @@ Widget categorySections(){
                         ),
                         child: GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsListPage()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsListPage(category: categoriesList[i].categoryName,)));
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),

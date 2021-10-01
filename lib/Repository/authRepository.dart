@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 class AuthRepository {
+  userModel currentUser;
 
   Future<userModel> login(String userEmail, String userPassword) async {
     SharedPreferences sharedPref = await SharedPreferences.getInstance();
@@ -33,6 +34,7 @@ class AuthRepository {
         //print('user is' + user.userEmail);
         //userProvider provider ;
        // provider.setData(user);
+        currentUser = user;
         return user;
       }catch(err)  {
         print('An error Accord ' + err.toString());
