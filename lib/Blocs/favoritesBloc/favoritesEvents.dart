@@ -19,8 +19,8 @@ class addToFavoritesButtonPressed extends FavoritesEvents {
   addToFavoritesButtonPressed({this.userId, this.productId, this.context});
 }
 class removeFromFavoritesButtonPressed extends FavoritesEvents {
-  String userId;
-  String productId;
+  String itemId;
   BuildContext context;
-  removeFromFavoritesButtonPressed({this.userId, this.productId, this.context});
+  removeFromFavoritesButtonPressed({this.itemId, this.context});
 }
+

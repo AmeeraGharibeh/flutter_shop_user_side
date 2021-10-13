@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
 import 'package:flutter_shop/Blocs/favoritesBloc/favoritesEvents.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
+import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartBloc.dart';
+import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartEvents.dart';
 import 'package:flutter_shop/Models/favoritesModel.dart';
 import 'package:flutter_shop/Models/productModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
@@ -58,7 +59,10 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
   int currentPage;
   bool isFavorite = false;
   FavoritesBloc favoritesBloc;
+  ShoppingCartBloc shoppingCartBloc;
   userModel user;
+  int quantity = 0;
+  String selectedSize;
   List<favoritesModel> fav;
 
   @override
@@ -66,7 +70,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
     super.initState();
     _controller = new TabController(length: 2, vsync: this);
     favoritesBloc = BlocProvider.of<FavoritesBloc>(context);
-
+    shoppingCartBloc = BlocProvider.of<ShoppingCartBloc>(context);
 
   }
 
@@ -103,9 +107,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
             for (var singleColor in productData.productColors) {
               colors.add(colorItem.fromJson(json.decode(singleColor)));
             }
-            List<favoritesModel> favList = [];
-            favList = favProvider.getUserFavs(productData.productId, user.userId);
-
+            List<favoritesModel> usersFavs = favProvider.getData();
             return Stack(
               children: [
                 SingleChildScrollView(
@@ -116,7 +118,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                           Container(
                             color: myColors.dustyOrange,
                             width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height * 0.80,
+                            height: MediaQuery.of(context).size.height * 0.90,
                             child: PageView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: imgs.length,
@@ -127,14 +129,13 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                 });
                               },
                               itemBuilder: (context, i) {
-
-                               return Image.network('http://192.168.1.39:4000/'+ imgs[i], fit: BoxFit.fill,);
+                               return Image.network('http://192.168.1.39:4000/'+ imgs[i], fit: BoxFit.cover,);
                               },
                             ),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 30),
+                                horizontal: 14, vertical: 40),
                             width: MediaQuery.of(context).size.width,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,9 +179,8 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                         if(isFavorite == true && favProvider.getUserFavs(productData.productId, user.userId).isEmpty) {
                                           favoritesBloc.add(addToFavoritesButtonPressed(userId: user.userId, productId: productData.productId, context: context));
                                         } else {
-                                        // remove event
+                                          favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favProvider.singleItem(productData.productId, user.userId).favoriteItemId));
                                         }
-
                                       },
                                       child: Icon(
                                       isFavorite || favProvider.isFavoriteByUser(productData.productId, user.userId) == true ? Icons.favorite : Icons
@@ -192,7 +192,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 430,),
+                            padding: const EdgeInsets.only(top: 500,),
                             child: Container(
                                 padding: const EdgeInsets.only(
                                     top: 30, left: 15, right: 15),
@@ -256,6 +256,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                                             onTap: () {
                                                               setState(() {
                                                                 selectedIndex = i;
+                                                                selectedSize = sizes[i].size;
                                                               });
                                                             },
                                                             child: Container(
@@ -369,7 +370,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                 ),
                                 child: GestureDetector(
                                   onTap: () {
-
+                                    shoppingCartBloc.add(addToShoppingCartButtonPressed(userId: user.userId, productId: productData.productId, price: productData.productPrice,size: selectedSize, quantity: quantity + 1, shippingFees: 20.0, context: context));
                                   },
                                   child: Icon(Icons.add_shopping_cart,
                                       color: myColors.deepPurple),

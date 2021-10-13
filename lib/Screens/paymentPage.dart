@@ -1,7 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_shop/Models/addressesModel.dart';
+import 'package:flutter_shop/Models/paymentMethodsModel.dart';
+import 'package:flutter_shop/Models/userModel.dart';
+import 'package:flutter_shop/Providers/dataProvider.dart';
+import 'package:flutter_shop/Providers/usersProvider.dart';
+import 'package:flutter_shop/Screens/addressesPage.dart';
+import 'package:flutter_shop/Screens/paymentCards.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
+import 'package:provider/provider.dart';
 
 class paymentPage extends StatelessWidget {
 
@@ -10,6 +18,17 @@ class paymentPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     Widget paymentUI (BuildContext context) {
+      var provider = Provider.of<userProvider>(context, listen: false);
+      userModel user = provider.getData();
+
+      String userAddress = user.defaultAddress;
+      String userCard = user.defaultPaymentCard;
+
+      var addressProvider = Provider.of<addressesProvider>(context, listen: false);
+      addressesModel address = addressProvider.getDataById(userAddress);
+      var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
+      userPaymentCard card = cardsProvider.getDataById(userCard);
+
       return Stack(
         children: [
           Padding(
@@ -35,11 +54,17 @@ class paymentPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Delivery Address', style: TextStyle(color: myColors.deepPurple, fontSize: 17, fontWeight: FontWeight.bold),),
-                              IconButton(icon: Icon(Icons.edit, size: 22), onPressed: (){}),
+                              IconButton(icon: Icon(Icons.edit, size: 22),
+                                  onPressed: (){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => addressesPage()));
+
+                                  }),
                             ],
                           ),
                           Divider(),
-                          Text('lorem ipsum hgkjihgnvhjjgldjgut nognjlldjhgw npllowjgnvit;sjgm kkfkk', style: TextStyle(color: Colors.black45, fontSize: 15, fontWeight: FontWeight.bold),),
+                          Text(address.country + ', ' + address.city + ', ' + address.area, style: TextStyle(color: Colors.black45, fontSize: 15, fontWeight: FontWeight.bold),),
+                          Text(address.addressDetails1 , style: TextStyle(color: Colors.black45, fontSize: 15, fontWeight: FontWeight.bold),),
+
                         ],
                       ),
                     ),
@@ -58,11 +83,16 @@ class paymentPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Credit cart Info', style: TextStyle(color: myColors.deepPurple, fontSize: 17, fontWeight: FontWeight.bold),),
-                              IconButton(icon: Icon(Icons.edit, size: 22), onPressed: (){},),
+                              IconButton(icon: Icon(Icons.edit, size: 22),
+                                onPressed: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => paymentCardsPage()));
+                                },),
                             ],
                           ),
                           Divider(),
-                          Text('xxxxxxxxxxxxxxxxx', style: TextStyle(color: Colors.black45, fontSize: 15, fontWeight: FontWeight.bold),),
+                          Text(card.cardHolder, style: TextStyle(color: Colors.black45, fontSize: 15, fontWeight: FontWeight.bold),),
+                          Text(card.cardNumber, style: TextStyle(color: Colors.black45, fontSize: 15, fontWeight: FontWeight.bold),),
+
                         ],
                       ),
                     ),
@@ -105,25 +135,35 @@ class paymentPage extends StatelessWidget {
           Positioned(
             bottom: 0,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 7),
+              padding: EdgeInsets.symmetric(horizontal: 7, vertical: 15),
               width: MediaQuery.of(context).size.width,
-              height: 50,
+              height: 130,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: Colors.grey[500])
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('Total: 230 \$'),
-                  SizedBox(width: 15,),
+                  Text('Total Price: \$400', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),),
+                  SizedBox(height: 15,),
                   Container(
-                    width: MediaQuery.of(context).size.width*0.60,
-                    color: myColors.dustyOrange,
-                    child: Center(
-                      child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 18),),
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    width: 200,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.redAccent, width: 2),
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(30)),
                     ),
-                  )
+                    child: Center(
+                        child: Text(
+                          'Submit',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
+                        )),
+                  ),
                 ],
               ),
             ),

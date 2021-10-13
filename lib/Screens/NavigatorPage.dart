@@ -41,11 +41,11 @@ void initState() {
     case 1:
       return CategoriesPage();
     case 2:
-      return cartPage();
+      return cartPage(currentUser: user,);
     case 3:
       return favoritesPage(currentUser: user);
     case 4:
-      return profilePage(currentUser: user,);
+      return profilePage(currentUser: user, repo: repo,);
   }
 }
          return Scaffold(

@@ -30,6 +30,8 @@ dependencies:
   flutter_bloc:
   provider:
   custom_navigation_bar: ^0.8.0
+  flutter_credit_card: ^3.0.0
+
 
 
 

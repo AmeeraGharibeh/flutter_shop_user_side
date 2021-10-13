@@ -2,26 +2,48 @@
 class ordersModel {
   String orderId;
   String userId;
+  String paymentId;
+  String totalPrice;
+  int quantity;
+  String trackingNo;
   String orderStatus;
-  DateTime createdAt;
-  int cartTotal;
-  List cartList ;
+  String createdAt;
+
+ordersModel({this.orderId, this.userId, this.paymentId, this.totalPrice, this.quantity, this.trackingNo, this.orderStatus, this.createdAt});
 
   ordersModel.fromMap (Map<String, dynamic> json) {
-    orderId = json['orderId'];
+    orderId = json['_id'];
     userId = json['userId'];
+    paymentId = json['paymentId'];
+    totalPrice = json['totalPrice'];
+    quantity = json['quantity'];
+    trackingNo = json['trackingNo'];
     orderStatus = json['orderStatus'];
     createdAt = json['createdAt'];
-    cartTotal = json['cartTotal'];
-    cartList = json['cartList'];
+
   }
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['orderId'] = this.orderId;
-    data['userId'] = this.userId;
-    data['orderStatus'] = this.orderStatus;
-    data['createdAt'] = this.createdAt;
-    data['cartTotal'] = this.cartTotal;
-    data['cartList'] = this.cartList;
+
+}
+
+
+class orderItemModel {
+  String orderItemId;
+  String orderId;
+  String productId;
+  int quantity;
+  String price;
+  String createdAt;
+
+  orderItemModel({this.orderItemId, this.orderId, this.productId, this.quantity, this.price, this.createdAt});
+
+  orderItemModel.fromMap (Map<String, dynamic> json) {
+    orderItemId = json['_id'];
+    orderId = json['orderId'];
+    productId = json['productId'];
+    quantity = json['quantity'];
+    price = json['price'];
+    createdAt = json['createdAt'];
+
   }
+
 }

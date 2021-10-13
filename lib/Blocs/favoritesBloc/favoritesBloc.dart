@@ -42,5 +42,16 @@ class FavoritesBloc extends Bloc<FavoritesEvents, FavoritesState> {
         print('error from add favorites Error ' +err.toString());
       }
     }
+    if (event is removeFromFavoritesButtonPressed) {
+      yield addFavoriteLoading();
+      try{
+        await repo.deleteFavoriteItem(event.itemId);
+        yield addFavoriteSuccess();
+      }catch(err){
+        yield addFavoriteFailure();
+        print('error from delete shoppingCart Error ' +err.toString());
+      }
+
+    }
   }
 }

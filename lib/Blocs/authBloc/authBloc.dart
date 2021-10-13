@@ -36,7 +36,7 @@ import 'package:shared_preferences/shared_preferences.dart';
       yield AuthUnAuthenticated();
      }
     }catch(err) {
-     print('error from try catch block in AuthBloc' + err);
+     print('error from try catch block in AuthBloc' + err.toString());
     }
    }
    if (event is loginButtonPressed) {
@@ -57,8 +57,49 @@ import 'package:shared_preferences/shared_preferences.dart';
    if (event is signUpButtonPressed){
     yield AuthLoading();
     try{
-     final data =await repo.signUp(event.userName, event.userEmail, event.userPassword, event.userPhone, event.userType, );
+     final data =await repo.signUp(event.userName, event.userEmail, event.userPassword, event.userPhone, event.address, event.payment, event.userType, );
      print('data from sign up : ' + data.userEmail);
+     var provider = Provider.of<userProvider>(event.context, listen: false);
+     provider.setData(data);
+     yield AuthAuthenticated(user: data);
+    }
+    catch (error) {
+     yield AuthError(msg: error.toString());
+     print('error from Auth Error ' +error.toString());
+    }
+
+   }
+   if (event is updateUsersInfo){
+    yield AuthLoading();
+    try{
+     final data =await repo.updateUser(event.userId, event.uerName, event.userPassword, event.userPhone );
+     var provider = Provider.of<userProvider>(event.context, listen: false);
+     provider.setData(data);
+     yield AuthAuthenticated(user: data);
+    }
+    catch (error) {
+     yield AuthError(msg: error.toString());
+     print('error from Auth Error ' +error.toString());
+    }
+
+   }
+   if (event is updateAddress){
+    yield AuthLoading();
+    try{
+     final data =await repo.updateAddress(event.userId, event.address);
+     var provider = Provider.of<userProvider>(event.context, listen: false);
+     provider.setData(data);
+     yield AuthAuthenticated(user: data);
+    }
+    catch (error) {
+     yield AuthError(msg: error.toString());
+     print('error from Auth Error ' +error.toString());
+    }
+   }
+   if (event is updatePaymentCard){
+    yield AuthLoading();
+    try{
+     final data =await repo.updatePaymentCard(event.userId, event.paymentCard);
      var provider = Provider.of<userProvider>(event.context, listen: false);
      provider.setData(data);
      yield AuthAuthenticated(user: data);

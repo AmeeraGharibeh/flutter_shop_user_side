@@ -1,14 +1,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
 import 'package:flutter_shop/Blocs/favoritesBloc/favoritesEvents.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
 import 'package:flutter_shop/Models/favoritesModel.dart';
 import 'package:flutter_shop/Models/productModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProvider.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +24,13 @@ class favoritesPage extends StatefulWidget {
 class _favoritesPageState extends State<favoritesPage> {
   bool isAsync = false;
   userModel get user => widget.currentUser;
+  FavoritesBloc favoritesBloc;
 
+  @override
+  void initState (){
+    favoritesBloc = BlocProvider.of<FavoritesBloc>(context);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -56,10 +61,9 @@ class _favoritesPageState extends State<favoritesPage> {
                         width: 90,
                         height: 110,
                         decoration: BoxDecoration(
-                          color: myColors.dustyOrange,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
+                          image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ usersFavorites[i].productPic.first,), fit: BoxFit.cover)
                         ),
-                        child: Image.network('http://192.168.1.39:4000/'+ usersFavorites[i].productPic.first),
                       ),
                       // SizedBox(width: 7,),
                       Container(
@@ -107,6 +111,7 @@ class _favoritesPageState extends State<favoritesPage> {
                           height: 25,
                           child: GestureDetector(
                             onTap: () async{
+                              favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favList[i].favoriteItemId));
                             },
                             child: Icon(
                               Icons.delete_outline, color: Colors.grey,

@@ -9,8 +9,10 @@ class userModel  {
   String userPassword;
   String userPhone;
   int userType;
+  String defaultAddress;
+  String defaultPaymentCard;
   String userToken;
-  userModel({this.userName, this.userEmail, this.userPassword, this.userPhone, this.userType, this.userToken});
+  userModel({this.userName, this.userEmail, this.userPassword, this.userPhone, this.userType, this.defaultAddress, this.defaultPaymentCard, this.userToken});
 
   userModel.fromMap (Map<String, dynamic> json) {
     userId = json['_id'];
@@ -19,16 +21,9 @@ class userModel  {
     userPassword = json['userPassword'];
     userPhone = json['userPhone'];
     userType = json['userType'];
+    defaultAddress = json['defaultAddress'];
+    defaultPaymentCard = json['defaultPaymentCard'];
     userToken = json['token'];
   }
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-   // data['userId'] = this.userId;
-    data['userName'] = this.userName;
-    data['userEmail'] = this.userEmail;
-    data['userPassword'] = this.userPassword;
-    data['userPhone'] = this.userPhone;
-    data['userType'] = this.userType;
-    data['token'] = this.userToken;
-  }
+
 }

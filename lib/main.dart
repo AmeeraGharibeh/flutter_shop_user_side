@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_shop/Blocs/addressesBloc/addressesBloc.dart';
+import 'package:flutter_shop/Blocs/addressesBloc/addressesStates.dart';
 import 'package:flutter_shop/Blocs/authBloc/authBloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
 import 'package:flutter_shop/Blocs/authBloc/authState.dart';
@@ -8,8 +10,11 @@ import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryState.dart';
 import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
 import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
+import 'package:flutter_shop/Blocs/paymentBloc/paymentBloc.dart';
+import 'package:flutter_shop/Blocs/paymentBloc/paymentStates.dart';
 import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
 import 'package:flutter_shop/Blocs/productBloc/productState.dart';
+import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartStates.dart';
 import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProvider.dart';
 import 'package:flutter_shop/Providers/usersProvider.dart';
@@ -22,6 +27,7 @@ import 'package:flutter_shop/wrapper.dart';
 import 'package:provider/provider.dart';
 
 import 'Blocs/brandBloc/brandState.dart';
+import 'Blocs/shoppingCartBloc/shoppingCartBloc.dart';
 
 
 void main() {
@@ -76,6 +82,12 @@ void dispose (){
            create: (BuildContext context)=> BrandBloc(fetchBrandInitialize(), fetchDataRepository())),
        BlocProvider<FavoritesBloc>(
            create: (BuildContext context)=> FavoritesBloc(fetchFavoritesInitialize(), fetchDataRepository())),
+       BlocProvider<ShoppingCartBloc>(
+           create: (BuildContext context)=> ShoppingCartBloc(fetchShoppingCartInitialize(), fetchDataRepository())),
+       BlocProvider<AddressesBloc>(
+           create: (BuildContext context)=> AddressesBloc(fetchAddressesInitialize(), fetchDataRepository())),
+       BlocProvider<PaymentBloc>(
+           create: (BuildContext context)=> PaymentBloc(paymentnitialize(), fetchDataRepository())),
      ],
       child: MultiProvider(
         providers: [
@@ -85,7 +97,9 @@ void dispose (){
           ChangeNotifierProvider(create: (_) => productsProvider(),),
           ChangeNotifierProvider(create: (_) => brandProvider(),),
           ChangeNotifierProvider(create: (_) => favoritesProvider(),),
-
+          ChangeNotifierProvider(create: (_) => shoppingCartProvider(),),
+          ChangeNotifierProvider(create: (_) => addressesProvider(),),
+          ChangeNotifierProvider(create: (_) => userPaymentProvider(),),
 
         ],
         child: MaterialApp(

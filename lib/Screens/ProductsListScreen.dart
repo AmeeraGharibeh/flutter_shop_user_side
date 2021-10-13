@@ -60,7 +60,7 @@ bool isFilterApplied = false;
   
   @override
   Widget build(BuildContext context) {
-    sortbyBottomhheet (List allProducts) {
+    sortbyBottomsheet (List allProducts) {
       showModalBottomSheet(
           context: context,
           shape: RoundedRectangleBorder(
@@ -432,8 +432,14 @@ bool isFilterApplied = false;
                                 Container(
                                     height: MediaQuery.of(context).size.height* 0.34,
                                     width: MediaQuery.of(context).size.width,
-                                    child: Image.network('http://192.168.1.39:4000/'+ productsList[i].productPic[0], fit: BoxFit.cover,)): Text(productsList[i].productId),
-
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: NetworkImage('http://192.168.1.39:4000/'+ productsList[i].productPic[0]), fit: BoxFit.cover)
+                                    )
+                                  )
+                                    : Center(
+                                  child: Text('no image found'),
+                                ),
                         ),
                               SizedBox(height: 10,),
                               Align(
@@ -490,8 +496,8 @@ bool isFilterApplied = false;
                         ),
 
                         Positioned(
-                            top: 8,
-                            right: 29,
+                            top: 15,
+                            right: 25,
                             child: Container(
                                 width: 35,
                                 height: 35,
@@ -526,12 +532,6 @@ bool isFilterApplied = false;
                 }),
           );
     }
-    void onWidgetDidBuild(Function callback) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        callback();
-      });
-    }
-
     Widget productsListUI (BuildContext context, favoritesProvider favProvider){
       return Consumer<productsProvider>(
         builder: (context, provider, child) {
@@ -544,7 +544,6 @@ bool isFilterApplied = false;
           allProducts = provider.getDataByFilter(selectedFilterColors, selectedFilterSizes, selectedFilterBrands);
 
         }
-
         return Padding(
           padding: const EdgeInsets.only(right: 10, left: 10),
           child: Container(
@@ -599,7 +598,7 @@ bool isFilterApplied = false;
                               height: 45,
                               child: TextButton(
                                 onPressed: () {
-                                  sortbyBottomhheet(allProducts);
+                                  sortbyBottomsheet(allProducts);
                                 },
                                 child: Center(
                                     child: Text('Sort By',

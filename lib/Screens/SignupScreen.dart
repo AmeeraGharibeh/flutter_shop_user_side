@@ -423,10 +423,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 Center(
                   child: GestureDetector(
                     onTap: () async{
-                      setState(() {
-                        isAsync = true;
-                      });
-                      authBloc.add(signUpButtonPressed(userName: userFirstName+' '+userLastName, userEmail: userEmail, userPassword: userPassword, userPhone: userPhone, userType: 0));
+
+                      authBloc.add(signUpButtonPressed(userName: userFirstName+' '+userLastName, userEmail: userEmail, userPassword: userPassword, userPhone: userPhone, address: '', payment: '', userType: 0));
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width*0.70,
