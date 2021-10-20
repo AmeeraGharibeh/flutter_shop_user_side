@@ -25,25 +25,3 @@ ordersModel({this.orderId, this.userId, this.paymentId, this.totalPrice, this.qu
 
 }
 
-
-class orderItemModel {
-  String orderItemId;
-  String orderId;
-  String productId;
-  int quantity;
-  String price;
-  String createdAt;
-
-  orderItemModel({this.orderItemId, this.orderId, this.productId, this.quantity, this.price, this.createdAt});
-
-  orderItemModel.fromMap (Map<String, dynamic> json) {
-    orderItemId = json['_id'];
-    orderId = json['orderId'];
-    productId = json['productId'];
-    quantity = json['quantity'];
-    price = json['price'];
-    createdAt = json['createdAt'];
-
-  }
-
-}

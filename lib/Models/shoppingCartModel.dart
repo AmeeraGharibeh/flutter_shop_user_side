@@ -1,4 +1,3 @@
-
 class shoppingCartModel {
 
   String cartItemId;

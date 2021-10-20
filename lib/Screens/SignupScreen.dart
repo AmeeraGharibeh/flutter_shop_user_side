@@ -421,26 +421,30 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 SizedBox(height: 35,),
                 Center(
-                  child: GestureDetector(
-                    onTap: () async{
+                  child: Container(
+                    width: MediaQuery.of(context).size.width*0.70,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [
+                            myColors.lightPink,
+                            myColors.dustyOrange,
+                          ]
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    child: TextButton(
+                      onPressed: (){
+                        if (formKey.currentState.validate()) {
+                          setState(() {
+                            isAsync = true;
+                          });
+                          authBloc.add(signUpButtonPressed(userName: userFirstName+' '+userLastName, userEmail: userEmail, userPassword: userPassword, userPhone: userPhone, address: '', payment: '', userType: 0, context: context));
 
-                      authBloc.add(signUpButtonPressed(userName: userFirstName+' '+userLastName, userEmail: userEmail, userPassword: userPassword, userPhone: userPhone, address: '', payment: '', userType: 0));
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width*0.70,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                              myColors.lightPink,
-                              myColors.dustyOrange,
-                            ]
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                      ),
-                      child: TextButton(
-                        child: Text('Sign Up',  style: TextStyle(color: myColors.deepPurple, fontSize: 19, fontWeight: FontWeight.bold)),
-                      ),
+                        }
+
+                      },
+                      child: Text('Sign Up',  style: TextStyle(color: myColors.deepPurple, fontSize: 19, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ),

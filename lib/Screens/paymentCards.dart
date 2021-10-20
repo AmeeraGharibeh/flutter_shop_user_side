@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_credit_card/credit_card_brand.dart';
 import 'package:flutter_credit_card/credit_card_form.dart';
@@ -11,7 +10,7 @@ import 'package:flutter_shop/Blocs/paymentBloc/paymentBloc.dart';
 import 'package:flutter_shop/Blocs/paymentBloc/paymentEvents.dart';
 import 'package:flutter_shop/Models/paymentMethodsModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
-import 'package:flutter_shop/Providers/dataProvider.dart';
+import 'package:flutter_shop/Providers/dataProviders/userPaymentCardsProvider.dart';
 import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:provider/provider.dart';
@@ -255,7 +254,7 @@ class _paymentCardsPageState extends State<paymentCardsPage> {
     user = provider.getData();
     List<userPaymentCard> userCards = [];
     var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
-    userCards = cardsProvider.getData();
+    ///userCards = cardsProvider.getData();
     return Scaffold(
       backgroundColor: myColors.backGroundShade,
       appBar: AppBar(
@@ -345,11 +344,9 @@ class _paymentCardsPageState extends State<paymentCardsPage> {
                                       child:  GestureDetector(
                                         onTap: (){
                                             if (formKey.currentState.validate()) {
+                                              Navigator.pop(context);
                                               paymentBloc.add(addPaymentButtonPressed(userId: user.userId, cardNumber: cardNumber, expireDate: expiryDate, cardHolder: cardHolderName, CVV: cvvCode, context: context));
                                               validDialog(context, 'Valid', 'Your Card has been added successfully!');
-                                              SchedulerBinding.instance.addPostFrameCallback((_) {
-                                                Navigator.pop(context);
-                                              });
                                             } else {
                                               validDialog(context, 'Error', 'Adding new card failed!');
                                             }
@@ -402,11 +399,23 @@ class _paymentCardsPageState extends State<paymentCardsPage> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height-100,
-                child: ListView.builder(
-                  itemCount: userCards.length,
-                  itemBuilder: (context, i) {
-                    return paymentCard(userCards[i].cardNumber, userCards[i].cardHolder, userCards[i].expireDate, userCards[i].CVVcode, i, userCards[i].userId, userCards[i].userPaymentCardId
-                    );
+                child: StreamBuilder(
+                  stream: cardsProvider.fetchUsersPayment().asStream() ,
+                  builder: (context, snapdata) {
+                    switch(snapdata.connectionState){
+                    case ConnectionState.waiting: return Center(child: CircularProgressIndicator(),);
+                    default: if(snapdata.hasError){
+                    return Text('Please Wait....');
+                    }else {
+                    return ListView.builder(
+                        itemCount: snapdata.data.length,
+                        itemBuilder: (context, i) {
+                          return paymentCard(snapdata.data[i].cardNumber,snapdata.data[i].cardHolder, snapdata.data[i].expireDate,snapdata.data[i].CVVcode, i,snapdata.data[i].userId, snapdata.data[i].userPaymentCardId
+                          );
+                        },
+                      );
+                    }
+                    }
                   },
                 ),
               )

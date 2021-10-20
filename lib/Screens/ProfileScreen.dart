@@ -6,8 +6,8 @@ import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
 import 'package:flutter_shop/Models/addressesModel.dart';
 import 'package:flutter_shop/Models/paymentMethodsModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
-import 'package:flutter_shop/Providers/dataProvider.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
+import 'package:flutter_shop/Providers/dataProviders/addressesProvider.dart';
+import 'package:flutter_shop/Providers/dataProviders/userPaymentCardsProvider.dart';
 import 'package:flutter_shop/Screens/addressesPage.dart';
 import 'package:flutter_shop/Screens/ordersPage.dart';
 import 'package:flutter_shop/Screens/paymentCards.dart';
@@ -17,9 +17,8 @@ import 'package:provider/provider.dart';
 
 class profilePage extends StatefulWidget {
   userModel currentUser;
-  fetchDataRepository repo;
 
-  profilePage({this.currentUser, this.repo});
+  profilePage({this.currentUser});
   @override
   _profilePageState createState() => _profilePageState();
 }
@@ -28,7 +27,6 @@ class _profilePageState extends State<profilePage> {
   bool isAsync = false;
   AuthBloc authBloc;
   userModel get user => widget.currentUser;
-  fetchDataRepository get repo => widget.repo;
   bool isNameEdit = false;
   bool isNumberEdit = false;
   bool isPasswordReset = false;
@@ -45,13 +43,23 @@ class _profilePageState extends State<profilePage> {
 
   @override
   Widget build(BuildContext context) {
-
     String userAddress = user.defaultAddress;
+    addressesModel address;
+    if (userAddress != ''){
+  var addressProvider = Provider.of<addressesProvider>(context, listen: false);
+  address = addressProvider.getDataById(userAddress);
+} else{
+      address = null;
+    }
     String userCard = user.defaultPaymentCard;
-    var addressProvider = Provider.of<addressesProvider>(context, listen: false);
-    addressesModel address = addressProvider.getDataById(userAddress);
-    var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
-    userPaymentCard card = cardsProvider.getDataById(userCard);
+    userPaymentCard card;
+   if (userCard != ''){
+     var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
+     card = cardsProvider.getDataById(userCard);
+   } else {
+     card= null;
+   }
+
 
     Future <AlertDialog> validDialog(BuildContext context, String title, String content,) {
       showDialog<AlertDialog>(

@@ -1,33 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_shop/Blocs/addressesBloc/addressesBloc.dart';
-import 'package:flutter_shop/Blocs/addressesBloc/addressesEvents.dart';
-import 'package:flutter_shop/Blocs/addressesBloc/addressesStates.dart';
 import 'package:flutter_shop/Blocs/authBloc/authBloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
 import 'package:flutter_shop/Blocs/authBloc/authState.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesEvents.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
-import 'package:flutter_shop/Blocs/paymentBloc/paymentBloc.dart';
-import 'package:flutter_shop/Blocs/paymentBloc/paymentEvents.dart';
-import 'package:flutter_shop/Blocs/paymentBloc/paymentStates.dart';
-import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartBloc.dart';
-import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartEvents.dart';
-import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartStates.dart';
 import 'package:flutter_shop/Models/userModel.dart';
-import 'package:flutter_shop/Providers/usersProvider.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
-import 'package:provider/provider.dart';
 
 class homePage extends StatefulWidget {
   userModel currentUser;
-  fetchDataRepository repo;
 
-  homePage({this.currentUser, this.repo});
+  homePage({this.currentUser});
   @override
   _homePageState createState() => _homePageState();
 }
@@ -35,28 +19,11 @@ class homePage extends StatefulWidget {
 class _homePageState extends State<homePage> {
   AuthBloc authBloc;
   userModel get user => widget.currentUser;
-  fetchDataRepository get repo => widget.repo;
-  FavoritesBloc favoritesBloc;
-  FavoritesState favoritesState;
-  ShoppingCartBloc shoppingCartBloc;
-  ShoppingCartState shoppingCartState;
-  AddressesBloc addressesBloc;
-  AddressesState addressesState;
-  PaymentBloc paymentBloc;
-  PaymentState paymentState;
-  @override
 
   @override
   void initState (){
     authBloc = BlocProvider.of<AuthBloc>(context);
-    favoritesBloc = FavoritesBloc(favoritesState, repo);
-    favoritesBloc.add(favoritesInit(userId: user.userId , context: context));
-    shoppingCartBloc = ShoppingCartBloc(shoppingCartState, repo);
-    shoppingCartBloc.add(shoppingCartInit(userId: user.userId , context: context));
-    addressesBloc = AddressesBloc(addressesState, repo);
-    addressesBloc.add(addressesInit(userId: user.userId, context: context));
-    paymentBloc = PaymentBloc(paymentState, repo);
-    paymentBloc.add(paymentInit(userId: user.userId, context: context));
+
     super.initState();
   }
 

@@ -6,14 +6,10 @@ import 'package:flutter_shop/Blocs/authBloc/authState.dart';
 import 'package:flutter_shop/Blocs/brandBloc/brandBloc.dart';
 import 'package:flutter_shop/Blocs/brandBloc/brandState.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesBloc.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesEvents.dart';
-import 'package:flutter_shop/Blocs/favoritesBloc/favoritesStates.dart';
 import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
 import 'package:flutter_shop/Blocs/productBloc/productEvents.dart';
 import 'package:flutter_shop/Blocs/productBloc/productState.dart';
 import 'package:flutter_shop/Repository/authRepository.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
 import 'package:flutter_shop/Screens/LoginScreen.dart';
 import 'package:flutter_shop/Screens/NavigatorPage.dart';
 import 'package:flutter_shop/Screens/SignupScreen.dart';
@@ -22,13 +18,13 @@ import 'package:flutter_shop/Screens/errorPage.dart';
 import 'Blocs/brandBloc/brandEvents.dart';
 import 'Blocs/categoryBloc/categoryEvents.dart';
 import 'Blocs/categoryBloc/categoryState.dart';
+import 'Blocs/favoritesBloc/favoritesEvents.dart';
 import 'Blocs/productBloc/productState.dart';
 
 
 class wrapper extends StatefulWidget {
   AuthRepository repo;
-  fetchDataRepository dataRepo;
-  wrapper({this.repo, this.dataRepo});
+  wrapper({this.repo});
 
   @override
   _wrapperState createState() => _wrapperState();
@@ -38,7 +34,6 @@ class _wrapperState extends State<wrapper> {
 
   AuthBloc authBloc;
   AuthRepository get repo => widget.repo;
-  fetchDataRepository get fetchRepo => widget.dataRepo;
   AuthStates states;
   CategoriesBloc categoriesBloc;
   CategoryState categoryState;
@@ -48,16 +43,18 @@ class _wrapperState extends State<wrapper> {
   productState ProductState;
 
 
+
   @override
   void initState() {
     authBloc = AuthBloc(states,repo);
     authBloc.add(AppStarted(context: context));
-    categoriesBloc = CategoriesBloc(categoryState, fetchRepo);
+    categoriesBloc = CategoriesBloc(categoryState);
     categoriesBloc.add(categoriesInit(context: context));
-    ProductsBloc = productBloc(ProductState, fetchRepo);
+    ProductsBloc = productBloc(ProductState);
     ProductsBloc.add(initEvent(context: context));
-    brandBloc = BrandBloc(brandState, fetchRepo);
+    brandBloc = BrandBloc(brandState);
     brandBloc.add(brandsInit(context: context));
+
     super.initState();
   }
   @override
@@ -74,7 +71,7 @@ class _wrapperState extends State<wrapper> {
       } else {
         if (state is AuthAuthenticated ) {
 
-          return NavigatorPage(repo: fetchRepo, currentUser: state.user,);
+          return NavigatorPage( currentUser: state.user,);
         }
         if (state is AuthUnAuthenticated) {
           return authenticate(repo: repo,);

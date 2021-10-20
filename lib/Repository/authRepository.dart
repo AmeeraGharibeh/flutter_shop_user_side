@@ -44,7 +44,7 @@ class AuthRepository {
   Future<userModel> signUp (String userName, String userEmail, String userPassword, String userPhone, String address, String paymentCard, int userType) async{
     SharedPreferences sharedPref = await SharedPreferences.getInstance();
     var body = json.encode({'userEmail': userEmail, 'userPassword': userPassword, 'userName': userName, 'userPhone': userPhone,'defaultAddress': address, 'defaultPaymentCard': paymentCard, 'userType': userType,});
-    var response = await http.post('http://192.168.1.39:4000/auth/signup',
+    var response = await http.post(apiURL + 'auth/signup',
         headers:<String, String> {
           'Content-Type': 'application/json; charset-utf=8',
           'Accept': 'application/json',}, body: body);

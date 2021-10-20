@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryBloc.dart';
 import 'package:flutter_shop/Blocs/categoryBloc/categoryState.dart';
-import 'package:flutter_shop/Models/categoriesModel.dart';
-import 'package:flutter_shop/Providers/dataProvider.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
+import 'package:flutter_shop/Providers/dataProviders/categoriesProvider.dart';
 import 'package:flutter_shop/Screens/ProductsListScreen.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
@@ -74,52 +72,61 @@ Widget categorySections(){
 }
 
     Widget categoriesList () {
-      return  Consumer<categoriesProvider>(
-        builder: (context, provider, child){
-          List<categoriesModel> categoriesList = provider.getData();
-          List<Color> listItemsColors = [
-            myColors.dustyOrange, myColors.lightPink, myColors.lightOrange, myColors.lightAmber];
-          return Stack(
-            children: [
-              Container(
-                padding: EdgeInsets.only( left: 5, right: 5, bottom: 10),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: ListView.builder(
-                  itemCount: categoriesList.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, i) {
-                    return  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 90,
-                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                          color: listItemsColors[i % 4].withOpacity(0.2)
-                        ),
-                        child: GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsListPage(category: categoriesList[i].categoryName,)));
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(categoriesList[i].categoryName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black54),), Icon(Icons.arrow_drop_down)],
+  var provider = Provider.of<categoriesProvider>(context, listen: false);
+      return StreamBuilder(
+        stream: provider.fetchCategories().asStream(),
+        builder: (context, snapshot){
+          switch(snapshot.connectionState){
+            case ConnectionState.waiting: return Center(child: CircularProgressIndicator(),);
+            default: if(snapshot.hasError){
+              return Text('Please Wait....');
+            }else {
+              List<Color> listItemsColors = [
+                myColors.dustyOrange, myColors.lightPink, myColors.lightOrange, myColors.lightAmber];
+              return Stack(
+                children: [
+                  Container(
+                      padding: EdgeInsets.only( left: 5, right: 5, bottom: 10),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView.builder(
+                        itemCount: snapshot.data.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, i) {
+                          return  Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 90,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  color: listItemsColors[i % 4].withOpacity(0.2)
+                              ),
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsListPage(category: snapshot.data[i].categoryName,)));
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(snapshot.data[i].categoryName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black54),), Icon(Icons.arrow_drop_down)],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                )
-              ),
-            ],
-          );
+                          );
+                        },
+                      )
+                  ),
+                ],
+              );
+            }
+          }
+
         },
       );
 

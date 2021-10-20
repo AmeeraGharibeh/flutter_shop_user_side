@@ -1,27 +1,30 @@
-
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/paymentBloc/paymentEvents.dart';
 import 'package:flutter_shop/Blocs/paymentBloc/paymentStates.dart';
 import 'package:flutter_shop/Models/paymentMethodsModel.dart';
-import 'package:flutter_shop/Providers/dataProvider.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
+import 'package:flutter_shop/Models/userModel.dart';
+import 'package:flutter_shop/Providers/dataProviders/userPaymentCardsProvider.dart';
+import 'package:flutter_shop/Providers/usersProvider.dart';
+import 'package:flutter_shop/Repository/authRepository.dart';
 import 'package:provider/provider.dart';
+
+
 class PaymentBloc extends Bloc<PaymentEvents, PaymentState> {
-  fetchDataRepository repo;
-  PaymentBloc(PaymentState initialState, this.repo) : super(initialState);
+  AuthRepository auth;
+
+  PaymentBloc(PaymentState initialState, this.auth) : super(initialState);
 
   @override
   Stream<PaymentState> mapEventToState(PaymentEvents event) async*{
     if (event is paymentInit) {
       try{
         yield paymentLoading();
-        List<userPaymentCard> paymentList = await repo.fetchUsersPayment();
-        List<userPaymentCard> usersPayments = [];
-        usersPayments = paymentList.where((element) => element.userId == event.userId).toList();
-        print('data from userPaymentCard bloc : ' + usersPayments.first.cardHolder);
-
         var provider = Provider.of<userPaymentProvider>(event.context, listen: false);
-        provider.setData(usersPayments);
+        List<userPaymentCard> paymentList = await provider.fetchUsersPayment();
+
+      provider.setData(paymentList, event.userId);
+
         yield paymentSuccess();
       } catch (err) {
         yield paymentFailure(msg: err.toString());
@@ -31,9 +34,12 @@ class PaymentBloc extends Bloc<PaymentEvents, PaymentState> {
     if (event is addPaymentButtonPressed) {
       yield paymentLoading();
       try{
-        userPaymentCard paymentObj = await repo.postPaymentCad(event.paymentMethodId, event.userId, event.cardNumber, event.expireDate, event.cardHolder, event.CVV);
         var provider = Provider.of<userPaymentProvider>(event.context, listen: false);
+        userPaymentCard paymentObj = await provider.postPaymentCad(event.paymentMethodId, event.userId, event.cardNumber, event.expireDate, event.cardHolder, event.CVV);
         provider.setOne(paymentObj);
+        userModel user = await auth.updatePaymentCard(event.userId, paymentObj.userPaymentCardId);
+        var userPr = Provider.of<userProvider>(event.context, listen: false);
+        userPr.setData(user);
         yield paymentSuccess();
 
       }catch(err){
@@ -44,8 +50,8 @@ class PaymentBloc extends Bloc<PaymentEvents, PaymentState> {
    if (event is updatePayment) {
       yield paymentLoading();
       try{
-        userPaymentCard paymentObj = await repo.updatePaymentCard(event.id, event.number, event.name, event.date, event.cvv);
         var provider = Provider.of<userPaymentProvider>(event.context, listen: false);
+        userPaymentCard paymentObj = await provider.updatePaymentCard(event.id, event.number, event.name, event.date, event.cvv);
         provider.setOne(paymentObj);
         yield paymentSuccess();
 
@@ -57,7 +63,8 @@ class PaymentBloc extends Bloc<PaymentEvents, PaymentState> {
     if (event is removePaymentButtonPressed) {
       yield paymentLoading();
       try{
-        await repo.deletePaymentCard(event.itemId);
+        var provider = Provider.of<userPaymentProvider>(event.context, listen: false);
+        await provider.deletePaymentCard(event.itemId);
         yield paymentSuccess();
       }catch(err){
         yield paymentFailure();

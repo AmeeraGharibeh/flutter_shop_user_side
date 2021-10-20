@@ -2,25 +2,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/addressesBloc/addressesEvents.dart';
 import 'package:flutter_shop/Blocs/addressesBloc/addressesStates.dart';
 import 'package:flutter_shop/Models/addressesModel.dart';
-import 'package:flutter_shop/Providers/dataProvider.dart';
-import 'package:flutter_shop/Repository/fetchDataRepo.dart';
+import 'package:flutter_shop/Models/userModel.dart';
+import 'package:flutter_shop/Providers/dataProviders/addressesProvider.dart';
+import 'package:flutter_shop/Providers/usersProvider.dart';
+import 'package:flutter_shop/Repository/authRepository.dart';
 import 'package:provider/provider.dart';
 
 class AddressesBloc extends Bloc<AddressesEvents, AddressesState> {
-  fetchDataRepository repo;
-  AddressesBloc(AddressesState initialState, this.repo) : super(initialState);
+  AuthRepository auth;
+  AddressesBloc(AddressesState initialState, this.auth) : super(initialState);
 
   @override
   Stream<AddressesState> mapEventToState(AddressesEvents event) async*{
     if (event is addressesInit) {
       try{
         yield fetchAddressesLoading();
-        List<addressesModel> addressesList = await repo.fetchUsersAddresse();
-        List<addressesModel> usersAddresses = [];
-        usersAddresses = addressesList.where((element) => element.userId == event.userId).toList();
-        print('data from addresses bloc : ' + usersAddresses.first.name);
         var provider = Provider.of<addressesProvider>(event.context, listen: false);
-        provider.setData(usersAddresses);
+        List<addressesModel> addressesList = await provider.fetchUsersAddresse();
+        provider.setData(addressesList, event.userId);
         yield fetchAddressesSuccess();
       } catch (err) {
         yield fetchAddressesFailure(msg: err.toString());
@@ -30,9 +29,24 @@ class AddressesBloc extends Bloc<AddressesEvents, AddressesState> {
     if (event is addAddresssButtonPressed) {
       yield addAddressesLoading();
       try{
-        addressesModel addressObj = await repo.posAddress(event.userId, event.name, event.country, event.city, event.area, event.details1, event.details2);
+        /*    var provider = Provider.of<addressesProvider>(event.context, listen: false);
+        addressesModel addressObj = await repo.posAddress(event.userId, event.name, event.country, event.city, event.area, event.details1, event.details2).then((value) async {
+          List<addressesModel> addressesList = await repo.fetchUsersAddresse();
+          List<addressesModel> usersAddresses = [];
+          usersAddresses = addressesList.where((element) => element.userId == event.userId).toList();
+          userModel user = await auth.updateAddress(event.userId, value.addressId);
+          var userPr = Provider.of<userProvider>(event.context, listen: false);
+          userPr.setData(user);
+          return provider.setData(usersAddresses);
+
+        });
+        provider.setOne(addressObj);*/
         var provider = Provider.of<addressesProvider>(event.context, listen: false);
+        addressesModel addressObj = await provider.posAddress(event.userId, event.name, event.country, event.city, event.area, event.details1, event.details2);
         provider.setOne(addressObj);
+        userModel user = await auth.updateAddress(event.userId, addressObj.addressId);
+        var userPr = Provider.of<userProvider>(event.context, listen: false);
+        userPr.setData(user);
         yield addAddressesSuccess();
 
       }catch(err){
@@ -43,8 +57,8 @@ class AddressesBloc extends Bloc<AddressesEvents, AddressesState> {
     if (event is updateAddressButtonPresses) {
       yield addAddressesLoading();
       try{
-        addressesModel addressObj = await repo.updateAddress(event.id, event.name, event.city, event.area, event.details1, event.details2);
         var provider = Provider.of<addressesProvider>(event.context, listen: false);
+        addressesModel addressObj = await provider.updateAddress(event.id, event.name, event.city, event.area, event.details1, event.details2);
         provider.setOne(addressObj);
         yield addAddressesSuccess();
 
@@ -57,7 +71,8 @@ class AddressesBloc extends Bloc<AddressesEvents, AddressesState> {
     if (event is removeFromAddressesButtonPressed) {
       yield addAddressesLoading();
       try{
-        await repo.deleteAddress(event.itemId);
+        var provider = Provider.of<addressesProvider>(event.context, listen: false);
+        await provider.deleteAddress(event.itemId);
         yield addAddressesSuccess();
       }catch(err){
         yield addAddressesFailure();

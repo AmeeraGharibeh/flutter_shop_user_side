@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_shop/Models/orderItemModel.dart';
 
 class OrderDetailsEvents extends Equatable {
   @override
@@ -13,6 +14,7 @@ class orderDetailsInit extends OrderDetailsEvents {
   String toString() => 'ordersinit';
 }
 class addOrderDetailsButtonPressed extends OrderDetailsEvents {
+
   String userId;
   String paymentId;
   int quantity;
@@ -20,8 +22,15 @@ class addOrderDetailsButtonPressed extends OrderDetailsEvents {
   String trackingNo;
   String orderStatus;
   String createdAt;
+  List<orderItemModel> orderItem = [];
   BuildContext context;
-  addOrderDetailsButtonPressed({ this.userId, this.paymentId, this.totalPrice, this.quantity, this.trackingNo, this.orderStatus, this.createdAt, this.context});
+  addOrderDetailsButtonPressed({ this.userId, this.paymentId, this.totalPrice, this.quantity, this.trackingNo, this.orderStatus, this.createdAt, this.orderItem, this.context});
+}
+class updateOrderDetailsButtonPressed extends OrderDetailsEvents {
+  String id;
+  String status;
+  BuildContext context;
+  updateOrderDetailsButtonPressed({this.id, this.status, this.context});
 }
 class removeFromOrderDetailsButtonPressed extends OrderDetailsEvents {
   String itemId;
