@@ -1,17 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_shop/Blocs/orderDetailsBloc/orderDetailsBloc.dart';
-import 'package:flutter_shop/Blocs/orderDetailsBloc/orderDetailsEvents.dart';
 import 'package:flutter_shop/Blocs/orderItemBloc/orderItemBloc.dart';
+import 'package:flutter_shop/Blocs/orderItemBloc/orderItemEvents.dart';
 import 'package:flutter_shop/Models/addressesModel.dart';
-import 'package:flutter_shop/Models/orderItemModel.dart';
+import 'package:flutter_shop/Models/orderModel.dart';
 import 'package:flutter_shop/Models/paymentMethodsModel.dart';
 import 'package:flutter_shop/Models/productModel.dart';
 import 'package:flutter_shop/Models/shoppingCartModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProviders/addressesProvider.dart';
-import 'package:flutter_shop/Providers/dataProviders/orderItemProvider.dart';
+import 'package:flutter_shop/Providers/dataProviders/orderDetailsProvider.dart';
 import 'package:flutter_shop/Providers/dataProviders/productsProvider.dart';
 import 'package:flutter_shop/Providers/dataProviders/shoppingCartProvider.dart';
 import 'package:flutter_shop/Providers/dataProviders/userPaymentCardsProvider.dart';
@@ -31,58 +30,44 @@ class paymentPage extends StatefulWidget {
 
 class _paymentPageState extends State<paymentPage> {
   bool isAsync = false;
-  int totalPrice =0;
-  int totalQuantity = 0;
-  OrderDetailsBloc orderDetailsBloc;
   OrderItemBloc orderItemBloc;
+  List<shoppingCartModel> cartList = [];
+  List<productsModel> usersShoppingCart = [];
+  addressesModel address;
+  userPaymentCard card;
+  userModel user;
+  var cartProvider;
+  List<ordersModel> userOrder ;
+
+
 
   @override
   void initState(){
-    orderDetailsBloc = BlocProvider.of<OrderDetailsBloc>(context);
     orderItemBloc = BlocProvider.of<OrderItemBloc>(context);
-
   }
 
   @override
   Widget build(BuildContext context) {
      Widget paymentUI (BuildContext context) {
-      var provider = Provider.of<userProvider>(context, listen: false);
-      userModel user = provider.getData();
-      String sessionId;
+       var provider = Provider.of<userProvider>(context, listen: false);
+       userModel user = provider.getData();
+       String userAddress = user.defaultAddress;
+       String userCard = user.defaultPaymentCard;
+       var addressProvider = Provider.of<addressesProvider>(context, listen: false);
+       address = addressProvider.getDataById(userAddress);
+       var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
+       card = cardsProvider.getDataById(userCard);
+       cartProvider = Provider.of<shoppingCartProvider>(context, listen: false);
+       var orderProvider = Provider.of<orderDetailsProvider>(context);
+       userOrder = orderProvider.getDataById(user.userId);
+       userOrder.sort((a,b){
+         var aDate = a.createdAt;
+         var bDate = b.createdAt;
+         return bDate.compareTo(aDate);
+       });
+       print('list is' + userOrder.first.orderId);
 
-      var cartProvider = Provider.of<shoppingCartProvider>(context, listen: false);
-      List<shoppingCartModel> cartList = [];
-      cartList =  cartProvider.getData();
-
-      List<orderItemModel> userOrderList = [];
-      for (var item in cartList) {
-        var orderItemsProvider = Provider.of<orderItemProvider>(context, listen: false);
-        orderItemModel res = orderItemsProvider.getDataById(item.cartItemId);
-        userOrderList.add(res);
-        print('length: '+ userOrderList.length.toString());
-
-        // sessionId = orderItemsList.first.sessionId;
-      }
-
-
-      String userAddress = user.defaultAddress;
-      String userCard = user.defaultPaymentCard;
-      var addressProvider = Provider.of<addressesProvider>(context, listen: false);
-      addressesModel address = addressProvider.getDataById(userAddress);
-      List<productsModel> usersShoppingCart = [];
-      for (var item in cartList) {
-        var provider = Provider.of<productsProvider>(context, listen: false);
-        productsModel singleProduct = provider.getDataById(item.productId);
-        usersShoppingCart.add(singleProduct);
-      }
-      var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
-      userPaymentCard card = cardsProvider.getDataById(userCard);
-      for (var item in cartList){
-        totalPrice = totalPrice + item.productPrice;
-        totalQuantity = totalQuantity + item.quantity;
-      }
-
-      return Padding(
+       return Padding(
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -198,84 +183,100 @@ class _paymentPageState extends State<paymentPage> {
                         ],
                       ),
                       Divider(),
-                      Container(
-                          padding: EdgeInsets.all(15),
-                          width: MediaQuery.of(context).size.width,
-                          height: 300,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[500]),
-                              color: Colors.white
-                          ),
-                          child: ListView.builder(
-                            itemCount: cartList.length,
-                            itemBuilder: (context, i) {
-                              return  Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 7,
+                      StreamBuilder(
+                        stream: cartProvider.fetchShoppingCart().asStream(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(child: CircularProgressIndicator(),);
+                          } else{
+                            cartList = snapshot.data;
+                            for (var item in cartList) {
+                              var provider = Provider.of<productsProvider>(context, listen: false);
+                              List<productsModel> singleProduct = provider.getDataById(item.productId);
+                              usersShoppingCart.addAll(singleProduct);
+                            }
+                            return Container(
+                                padding: EdgeInsets.all(15),
+                                width: MediaQuery.of(context).size.width,
+                                height: 300,
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey[500]),
+                                    color: Colors.white
                                 ),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 90,
-                                        height: 110,
+                                child: ListView.builder(
+                                  itemCount: cartList.length,
+                                  itemBuilder: (context, i) {
+                                    return  Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 7,
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
                                         decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                                            image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ usersShoppingCart[i].productPic.first), fit: BoxFit.cover)
+                                          borderRadius: BorderRadius.all(Radius.circular(20)),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: 20,
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.only(top: 10),
-                                        width: 150,
-                                        height: 110,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              usersShoppingCart[i].productName,
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black),
-                                            ),
-                                            Text(cartList[i].productSize != null? cartList[i].productSize : '' ,
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.grey),
+                                            Container(
+                                              width: 90,
+                                              height: 110,
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                                                  image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ usersShoppingCart[i].productPic.first), fit: BoxFit.cover)
+                                              ),
                                             ),
                                             SizedBox(
-                                              height: 12,
+                                              width: 20,
                                             ),
-                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text('Quantity: ' + cartList[i].quantity.toString(), style: TextStyle(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.grey), ),
-                                                Text('\$:' + cartList[i].productPrice.toString(), style: TextStyle(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.grey), ),
-                                              ],
-                                            )
+                                            Container(
+                                              padding: EdgeInsets.only(top: 10),
+                                              width: 150,
+                                              height: 110,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    usersShoppingCart[i].productName,
+                                                    style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
+                                                  Text(cartList[i].productSize != null? cartList[i].productSize : '' ,
+                                                    style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Colors.grey),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 12,
+                                                  ),
+                                                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text('Quantity: ' + cartList[i].quantity.toString(), style: TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Colors.grey), ),
+                                                      Text('\$:' + cartList[i].productPrice.toString(), style: TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Colors.grey), ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ],
+
                                         ),
                                       ),
-                                    ],
+                                    );
+                                  },
+                                )
+                            );
+                          }
+                        },
 
-                                  ),
-                                ),
-                              );
-                            },
-                          )
                       ),
                     ],
                   ),
@@ -304,7 +305,9 @@ class _paymentPageState extends State<paymentPage> {
                       ),
                       GestureDetector(
                         onTap: (){
-                          orderDetailsBloc.add(addOrderDetailsButtonPressed( userId: user.userId, paymentId: user.defaultPaymentCard, totalPrice: totalPrice.toString(), quantity: totalQuantity,trackingNo: '99999999', orderStatus: 'validating', createdAt: DateTime.now().toString(), orderItem: userOrderList, context: context));
+                          for (var item in cartList){
+                            orderItemBloc.add(addOrderItemButtonPressed(orderId: userOrder.first.orderId, shoppingCartId: item.cartItemId, userId: item.userId , createdAt: DateTime.now().toString(), context: context ));
+                          }
                           setState(() {
                             isAsync = !isAsync;
                           });

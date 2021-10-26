@@ -9,7 +9,8 @@ class ordersModel {
   String orderStatus;
   String createdAt;
 
-ordersModel({this.orderId, this.userId, this.paymentId, this.totalPrice, this.quantity, this.trackingNo, this.orderStatus, this.createdAt});
+ordersModel({this.orderId, this.userId, this.paymentId, this.totalPrice, this.quantity,
+  this.trackingNo, this.orderStatus, this.createdAt});
 
   ordersModel.fromMap (Map<String, dynamic> json) {
     orderId = json['_id'];

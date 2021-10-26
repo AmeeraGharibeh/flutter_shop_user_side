@@ -91,5 +91,8 @@ class shoppingCartProvider with ChangeNotifier {
     notifyListeners();
   }
   getData () => allShoppingCart;
+  getDataById(String id){
+    return allShoppingCart.where((element) => element.cartItemId == id).toList();
+  }
 
 }

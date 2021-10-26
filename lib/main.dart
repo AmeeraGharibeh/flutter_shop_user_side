@@ -20,6 +20,7 @@ import 'package:flutter_shop/Blocs/productBloc/productBloc.dart';
 import 'package:flutter_shop/Blocs/productBloc/productState.dart';
 import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartStates.dart';
 import 'package:flutter_shop/Models/userModel.dart';
+import 'package:flutter_shop/Providers/dataProviders/sessionProvider.dart';
 import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Repository/authRepository.dart';
 import 'package:flutter_shop/Screens/LoginScreen.dart';
@@ -56,22 +57,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  AuthBloc authBloc;
   AuthRepository get repo => widget.userRepository;
-  CategoriesBloc categoriesBloc;
-  CategoryState categoryState;
-  AuthStates states;
   @override
   void initState() {
-    authBloc = AuthBloc(states,repo);
-    authBloc.add(AppStarted(context: context));
-    categoriesBloc = CategoriesBloc(categoryState);
     super.initState();
   }
 @override
 void dispose (){
-    authBloc.close();
-    categoriesBloc.close();
     super.dispose();
 }
 
@@ -114,6 +106,7 @@ void dispose (){
           ChangeNotifierProvider(create: (_) => userPaymentProvider(),),
           ChangeNotifierProvider(create: (_) => orderDetailsProvider(),),
           ChangeNotifierProvider(create: (_) => orderItemProvider(),),
+
 
 
 

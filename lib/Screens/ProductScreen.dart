@@ -8,7 +8,6 @@ import 'package:flutter_shop/Blocs/favoritesBloc/favoritesEvents.dart';
 import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartBloc.dart';
 import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartEvents.dart';
 import 'package:flutter_shop/Models/favoritesModel.dart';
-import 'package:flutter_shop/Models/productModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProviders/favoritesProvider.dart';
 import 'package:flutter_shop/Providers/dataProviders/productsProvider.dart';
@@ -50,6 +49,8 @@ class colorItem{
   }
 }
 class _productDetailsPageState extends State<productDetailsPage> with SingleTickerProviderStateMixin {
+  String thisItem;
+
   String get productId => widget.productId;
 
   bool isAsync = false;
@@ -66,13 +67,23 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
   String selectedSize;
   List<favoritesModel> fav;
 
+
   @override
   void initState() {
     super.initState();
     _controller = new TabController(length: 2, vsync: this);
     favoritesBloc = BlocProvider.of<FavoritesBloc>(context);
     shoppingCartBloc = BlocProvider.of<ShoppingCartBloc>(context);
-
+    var provider = Provider.of<userProvider>(context, listen: false);
+    user = provider.getData();
+    var favProvider = Provider.of<favoritesProvider>(context, listen: false);
+    if (favProvider.getUserFavs(productId, user.userId).isNotEmpty){
+      thisItem = favProvider.getUserFavs(productId, user.userId).first.favoriteItemId ;
+      isFavorite = true;
+    }else {
+        thisItem = '';
+        isFavorite = false;
+    }
   }
 
   @override
@@ -103,7 +114,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
               default: if(snapshot.hasError){
                 return Text('Please Wait....');
               }else {
-                var productData = snapshot.data.where((element) => element.productId == productId).toList().first;
+                var productData = snapshot.data.singleWhere((element) => element.productId == productId);
                 List imgs = List.from(
                     productData.productPic);
                 List<colorItem> colors = [];
@@ -114,6 +125,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                 for (var singleColor in productData.productColors) {
                   colors.add(colorItem.fromJson(json.decode(singleColor)));
                 }
+
                 return Stack(
                   children: [
                     SingleChildScrollView(
@@ -181,16 +193,18 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                             setState(() {
                                               isFavorite = !isFavorite;
                                             });
+                                            if(isFavorite == false) {
 
-                                            if(isFavorite == true && favProvider.getUserFavs(productData.productId, user.userId).isEmpty) {
                                               favoritesBloc.add(addToFavoritesButtonPressed(userId: user.userId, productId: productData.productId, context: context));
+
                                             } else {
-                                              favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favProvider.singleItem(productData.productId, user.userId).favoriteItemId));
+                                              print('item id: '+ thisItem );
+                                              favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: thisItem, context: context));
+
                                             }
                                           },
                                           child: Icon(
-                                            isFavorite || favProvider.isFavoriteByUser(productData.productId, user.userId) == true ? Icons.favorite : Icons
-                                                .favorite_border,
+                                            isFavorite ?  Icons.favorite : Icons.favorite_border,
                                             color: Colors.redAccent,),
                                         )
                                     ),
@@ -375,41 +389,39 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
 
                                     ),
                                     child: GestureDetector(
-                                      onTap: () {
+                                      onTap: ( ) async{
                                         // cartItemBloc.add(addToCartButtonPressed(userId: user.userId, productId: productData.productId, price: productData.productPrice,size: selectedSize, quantity: quantity ));
-                                        shoppingCartBloc.add(addToShoppingCartButtonPressed(userId: user.userId, productId: productData.productId, price: productData.productPrice,size: selectedSize, quantity: quantity + 1, shippingFees: 20.0, context: context));
-                                      },
+
+                                       shoppingCartBloc.add(addToShoppingCartButtonPressed(userId: user.userId, productId: productData.productId, price: productData.productPrice,size: selectedSize, quantity: quantity + 1, shippingFees: 20.0,  context: context));
+
+                                       Navigator.pushReplacement(context,
+                                            MaterialPageRoute(
+                                                builder: (context) => cartPage()));
+                                        },
                                       child: Icon(Icons.add_shopping_cart,
                                           color: myColors.deepPurple),
                                     )
                                 ),
                                 SizedBox(width: 15,),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.pushReplacement(context,
-                                        MaterialPageRoute(
-                                            builder: (context) => cartPage()));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 15),
-                                    width: MediaQuery.of(context).size.width - 150,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(30)),
-                                      gradient: LinearGradient(
-                                          colors: [
-                                            myColors.lightPink,
-                                            myColors.dustyOrange,
-                                          ]
-                                      ),
-                                      //color: myColors.lightOrange,
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 15),
+                                  width: MediaQuery.of(context).size.width - 150,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(30)),
+                                    gradient: LinearGradient(
+                                        colors: [
+                                          myColors.lightPink,
+                                          myColors.dustyOrange,
+                                        ]
                                     ),
-                                    child: Center(child: Text('Check Out Now',
-                                      style: TextStyle(fontSize: 16,
-                                          color: myColors.deepPurple,
-                                          fontWeight: FontWeight.bold),))
-                                    ,
+                                    //color: myColors.lightOrange,
                                   ),
+                                  child: Center(child: Text('Check Out Now',
+                                    style: TextStyle(fontSize: 16,
+                                        color: myColors.deepPurple,
+                                        fontWeight: FontWeight.bold),))
+                                  ,
                                 )
                               ],
                             ),

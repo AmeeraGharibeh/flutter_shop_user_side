@@ -8,6 +8,7 @@ class orderItemProvider with ChangeNotifier {
   String apiURL = 'http://192.168.1.39:4000/';
   List<orderItemModel> allOrderItems =[];
   orderItemModel orderItem;
+
   Future<List<orderItemModel>> fetchOrderItem ()async {
     var response = await http.get(apiURL + 'orderitem/getorderitem');
     final List<dynamic> data = json.decode(response.body);
@@ -88,8 +89,8 @@ class orderItemProvider with ChangeNotifier {
     orderItem = single;
     notifyListeners();
   }
-  //getData () => allOrderItems;
-  getDataById (String itemId) {
-    return allOrderItems.where((element) => element.shoppingCartId == itemId).first;
+  getData () => allOrderItems;
+  getDataById (String id) {
+    return allOrderItems.where((element) => element.shoppingCartId == id).toList();
   }
 }

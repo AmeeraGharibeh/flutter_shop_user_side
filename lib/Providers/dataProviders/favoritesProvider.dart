@@ -69,18 +69,27 @@ class favoritesProvider with ChangeNotifier {
     notifyListeners();
   }
   //getData () => allFavorites;
+
   List<favoritesModel> getUserFavs (String productId , String userId) {
     List<favoritesModel> favs = [];
     favs = allFavorites.where((element) => element.productId == productId && element.userId == userId).toList();
-    return favs.toSet().toList();
+    if (favs.isNotEmpty) {
+      return favs.toSet().toList();
+    } else{
+      return [];
+    }
+
   }
-  favoritesModel singleItem (String productId , String userId){
-    return allFavorites.where((element) => element.productId == productId && element.userId == userId).first;
+  String getFavorites (String userId, productId) {
+    notifyListeners();
+     allFavorites.where((element) => element.userId == userId && element.productId == productId );
   }
+
   bool isFavoriteByUser (String productId, String userId) {
     List<favoritesModel> favs = [];
     favs = allFavorites.where((element) => element.productId == productId && element.userId == userId).toList();
     favs = favs.toSet().toList();
+
     if (favs.isNotEmpty) {
       return true;
     } else {

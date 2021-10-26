@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
-import 'package:flutter_shop/wrapper.dart';
 
 class mySplashScreen extends StatefulWidget {
 
@@ -12,6 +11,7 @@ class _mySplashScreenState extends State<mySplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         backgroundColor: myColors.backGroundShade,
         body: Container(

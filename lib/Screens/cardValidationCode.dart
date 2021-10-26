@@ -5,8 +5,10 @@ import 'package:flutter_shop/Blocs/orderDetailsBloc/orderDetailsBloc.dart';
 import 'package:flutter_shop/Blocs/orderDetailsBloc/orderDetailsEvents.dart';
 import 'package:flutter_shop/Blocs/orderItemBloc/orderItemBloc.dart';
 import 'package:flutter_shop/Models/orderModel.dart';
+import 'package:flutter_shop/Models/shoppingCartModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProviders/orderDetailsProvider.dart';
+import 'package:flutter_shop/Providers/dataProviders/shoppingCartProvider.dart';
 import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:provider/provider.dart';
@@ -30,9 +32,20 @@ class _validationCardCodeState extends State<validationCardCode> {
   Widget build(BuildContext context) {
     var provider = Provider.of<userProvider>(context, listen: false);
     userModel user = provider.getData();
+    var cartProvider = Provider.of<shoppingCartProvider>(context, listen: false);
+    List<shoppingCartModel> cartList = [];
+    cartList =  cartProvider.getData();
+    print('xart'+cartList.length.toString() );
     var orderProvider = Provider.of<orderDetailsProvider>(context);
-    ordersModel userOrder ;
+    List<ordersModel> userOrder ;
     userOrder = orderProvider.getDataById(user.userId);
+
+    userOrder.sort((a,b){
+      var aDate = a.createdAt;
+      var bDate = b.createdAt;
+      return bDate.compareTo(aDate);
+    });
+    print('list is' + userOrder.first.orderId);
 
     
     return Scaffold(
@@ -93,11 +106,10 @@ class _validationCardCodeState extends State<validationCardCode> {
               GestureDetector(
                 onTap: (){
                   // i want the order id where orderUserId == user.userId && ordeSessionId == user.userSession
-                  print('order id:' + userOrder.orderId);
-                 // orderItemBloc.add(updateOrderItemButtonPresses(id: , orderId: , context: context));
+               //   orderItemBloc.add(updateOrderItemButtonPresses(id: , orderId:userOrder.orderId , context: context));
                   // i want the orderItem list where session id == orderList.getDataBy(sessionid);
                   // how to get to the order that was in cart?
-                  orderDetailsBloc.add(updateOrderDetailsButtonPressed(id: userOrder.orderId, status: 'processing', context: context));
+                  orderDetailsBloc.add(updateOrderDetailsButtonPressed(id: userOrder.first.orderId, status: 'processing', context: context));
                  // Navigator.push(context, MaterialPageRoute(builder: (context) => validationCardCode()));
                 },
                 child: Container(

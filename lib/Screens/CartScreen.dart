@@ -1,14 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_shop/Blocs/orderDetailsBloc/orderDetailsBloc.dart';
+import 'package:flutter_shop/Blocs/orderDetailsBloc/orderDetailsEvents.dart';
 import 'package:flutter_shop/Blocs/orderItemBloc/orderItemBloc.dart';
 import 'package:flutter_shop/Blocs/orderItemBloc/orderItemEvents.dart';
 import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartBloc.dart';
 import 'package:flutter_shop/Blocs/shoppingCartBloc/shoppingCartEvents.dart';
+import 'package:flutter_shop/Models/productModel.dart';
 import 'package:flutter_shop/Models/shoppingCartModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';
 import 'package:flutter_shop/Providers/dataProviders/productsProvider.dart';
+import 'package:flutter_shop/Providers/dataProviders/sessionProvider.dart';
 import 'package:flutter_shop/Providers/dataProviders/shoppingCartProvider.dart';
+import 'package:flutter_shop/Providers/usersProvider.dart';
 import 'package:flutter_shop/Screens/paymentPage.dart';
 import 'package:flutter_shop/Utlis/myColors.dart';
 import 'package:flutter_shop/Utlis/progressInd.dart';
@@ -28,15 +33,19 @@ class _cartPageState extends State<cartPage> {
   userModel get user => widget.currentUser;
   ShoppingCartBloc shoppingCartBloc;
   OrderItemBloc orderItemBloc;
-
-
-
-
+  int totalPrice =0;
+  int totalQuantity = 0;
+  OrderDetailsBloc orderDetailsBloc;
+  userModel currentUser;
 
   @override
   void initState() {
     shoppingCartBloc = BlocProvider.of<ShoppingCartBloc>(context);
     orderItemBloc = BlocProvider.of<OrderItemBloc>(context);
+    orderDetailsBloc = BlocProvider.of<OrderDetailsBloc>(context);
+    var provider = Provider.of<userProvider>(context, listen: false);
+    currentUser = provider.getData();
+
   }
 
   @override
@@ -105,188 +114,190 @@ class _cartPageState extends State<cartPage> {
     }
     Widget inCartProducts(List<shoppingCartModel> cartList) {
       var provider = Provider.of<productsProvider>(context, listen: false);
-      for (var item in cartList) {
-        return StreamBuilder(
-          stream: provider.fetchProducts().asStream(),
-          builder: (context, snapshot) {
-            switch(snapshot.connectionState){
-              case ConnectionState.waiting: return Center(child: CircularProgressIndicator(),);
-              default: if(snapshot.hasError){
-                return Text('Please Wait....');
-              }else {
-                List userProducts = snapshot.data.where((element) => element.productId == item.productId).toList();
-                return ListView.builder(
-                  itemCount: userProducts.length,
-                  itemBuilder: (context, i){
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 7,
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 25,
-                              height: 25,
-                              child: Checkbox(
-                                  activeColor: myColors.dustyOrange,
-                                  checkColor: Colors.white70,
-                                  value: true,
-                                  onChanged: (val) {}),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Container(
-                              width: 90,
-                              height: 110,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ userProducts[i].productPic.first), fit: BoxFit.cover)
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(top: 10),
-                              width: 150,
-                              height: 135,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    userProducts[i].productName,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                  Text(
-                                    'details',
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.grey),
-                                  ),
-                                  Text('o',
-                                    //cartList[i].productSize,
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.grey),
-                                  ),
-                                  SizedBox(
-                                    height: 12,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        width: 60,
-                                        height: 28,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey, width: 1),
-                                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                                        ),
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              GestureDetector(
-                                                  onTap: (){
-                                                    setState(() {
-                                                      cartList[i].quantity = cartList[i].quantity - 1;
-                                                    });
-                                                    shoppingCartBloc.add(updateShoppingCart(id: cartList[i].cartItemId, quantity: cartList[i].quantity - 1, context: context));
-                                                  },
-                                                  child: Text(
-                                                    '-',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Colors.grey),
-                                                  )
-                                              ),
-                                              Text(
-                                                cartList[i].quantity.toString(),
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.grey),
-                                              ),
-                                              GestureDetector(
-                                                  onTap: (){
-                                                    setState(() {
-                                                      cartList[i].quantity = cartList[i].quantity +1;
-                                                    });
-                                                    shoppingCartBloc.add(updateShoppingCart(id: cartList[i].cartItemId, quantity: cartList[i].quantity + 1, context: context));
-                                                  },
-                                                  child: Text(
-                                                    '+',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Colors.grey),
-                                                  )
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            '\$330',
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                decoration: TextDecoration.lineThrough,
-                                                color: Colors.black45),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            '\$'+ userProducts[i].productPrice.toString(),
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.deepOrangeAccent),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              child: Icon(Icons.delete_outline),
-                              onTap: (){
-                                setState(() {
-                                  userProducts.remove(snapshot.data[i]);
-                                });
-                                shoppingCartBloc.add(removeFromShoppingCartButtonPressed(itemId: cartList[i].cartItemId, context: context));
-                              },
-                            )
-                          ],
-
-                        ),
-                      ),
-                    );
-                  },
-
-                );
+      return StreamBuilder(
+        stream: provider.fetchProducts().asStream(),
+        builder: (context, snapshot) {
+          switch(snapshot.connectionState){
+            case ConnectionState.waiting: return Center(child: CircularProgressIndicator(),);
+            default: if(snapshot.hasError){
+              return Text('Please Wait....');
+            }else {
+              List<productsModel> userProducts = [];
+              for (var item in cartList) {
+                var res = snapshot.data.where((element) => element.productId == item.productId);
+                userProducts.addAll(res);
               }
+              return ListView.builder(
+                itemCount: userProducts.length,
+                itemBuilder: (context, i){
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 7,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 25,
+                            height: 25,
+                            child: Checkbox(
+                                activeColor: myColors.dustyOrange,
+                                checkColor: Colors.white70,
+                                value: true,
+                                onChanged: (val) {}),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Container(
+                            width: 90,
+                            height: 110,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(20)),
+                                image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ userProducts[i].productPic.first), fit: BoxFit.cover)
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(top: 10),
+                            width: 150,
+                            height: 135,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  userProducts[i].productName,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                Text(
+                                  'details',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey),
+                                ),
+                                Text('o',
+                                  //cartList[i].productSize,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey),
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      width: 60,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey, width: 1),
+                                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                                      ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            GestureDetector(
+                                                onTap: (){
+                                                  setState(() {
+                                                    cartList[i].quantity = cartList[i].quantity - 1;
+                                                  });
+                                                  shoppingCartBloc.add(updateShoppingCart(id: cartList[i].cartItemId, quantity: cartList[i].quantity - 1, context: context));
+                                                },
+                                                child: Text(
+                                                  '-',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.grey),
+                                                )
+                                            ),
+                                            Text(
+                                              cartList[i].quantity.toString(),
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.grey),
+                                            ),
+                                            GestureDetector(
+                                                onTap: (){
+                                                  setState(() {
+                                                    cartList[i].quantity = cartList[i].quantity +1;
+                                                  });
+                                                  shoppingCartBloc.add(updateShoppingCart(id: cartList[i].cartItemId, quantity: cartList[i].quantity + 1, context: context));
+                                                },
+                                                child: Text(
+                                                  '+',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.grey),
+                                                )
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          '\$330',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              decoration: TextDecoration.lineThrough,
+                                              color: Colors.black45),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          '\$'+ userProducts[i].productPrice.toString(),
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.deepOrangeAccent),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Icon(Icons.delete_outline),
+                            onTap: (){
+                              setState(() {
+                                userProducts.remove(snapshot.data[i]);
+                              });
+                              shoppingCartBloc.add(removeFromShoppingCartButtonPressed(itemId: cartList[i].cartItemId, context: context));
+                            },
+                          )
+                        ],
+
+                      ),
+                    ),
+                  );
+                },
+
+              );
             }
-          },
-        );
-      }
+          }
+        },
+      );
 
     }
 
@@ -300,6 +311,10 @@ class _cartPageState extends State<cartPage> {
             default: if(snapshot.hasError){
               return Text('Please Wait....');
             }else {
+              for (var item in snapshot.data){
+                totalPrice = totalPrice + item.productPrice;
+                totalQuantity = totalQuantity + item.quantity;
+              }
               return Stack(
                 children: [
                   Padding(
@@ -437,11 +452,12 @@ class _cartPageState extends State<cartPage> {
                           padding: EdgeInsets.symmetric(horizontal: 45),
                           child: GestureDetector(
                             onTap: () async{
+                              orderDetailsBloc.add(addOrderDetailsButtonPressed( userId: currentUser.userId, paymentId: user.defaultPaymentCard, totalPrice: totalPrice.toString(), quantity: totalQuantity, trackingNo: '99999999', orderStatus: 'validating', createdAt: DateTime.now().toString(), context: context));
 
-                              for (var item in snapshot.data){
+                     /*         for (var item in snapshot.data){
                                 orderItemBloc.add(addOrderItemButtonPressed(orderId: '', shoppingCartId: item.cartItemId, userId: item.userId , createdAt: DateTime.now().toString(), context: context ));
                               }
-                              // orderItemBloc.add(orderItemInit(context: context));
+                               orderItemBloc.add(orderItemInit(context: context));*/
                               setState(() {
                                 isAsync = !isAsync;
                               });

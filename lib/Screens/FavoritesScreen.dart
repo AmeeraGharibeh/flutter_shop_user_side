@@ -116,7 +116,7 @@ class _favoritesPageState extends State<favoritesPage> {
                                 height: 25,
                                 child: GestureDetector(
                                   onTap: () async{
-                                    favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favList[i].favoriteItemId));
+                                    favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favList[i].favoriteItemId, context: context));
                                   },
                                   child: Icon(
                                     Icons.delete_outline, color: Colors.grey,

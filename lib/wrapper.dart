@@ -77,7 +77,7 @@ class _wrapperState extends State<wrapper> {
           return authenticate(repo: repo,);
         }
         if (state == null) {
-          return errorPage();
+          return mySplashScreen();
         }
       }
     }

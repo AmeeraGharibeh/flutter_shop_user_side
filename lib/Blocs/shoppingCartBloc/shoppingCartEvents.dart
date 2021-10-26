@@ -25,8 +25,9 @@ class addToShoppingCartButtonPressed extends ShoppingCartEvents {
 class updateShoppingCart extends ShoppingCartEvents {
   String id;
   int quantity;
+  String sessionId;
   BuildContext context;
-  updateShoppingCart({this.id, this.quantity, this.context});
+  updateShoppingCart({this.id, this.quantity, this.sessionId, this.context});
 }
 class removeFromShoppingCartButtonPressed extends ShoppingCartEvents {
   String itemId;

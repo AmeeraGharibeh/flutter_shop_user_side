@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authBloc.dart';
 import 'package:flutter_shop/Blocs/authBloc/authEvents.dart';
+import 'package:flutter_shop/Blocs/orderItemBloc/orderItemBloc.dart';
+import 'package:flutter_shop/Blocs/orderItemBloc/orderItemEvents.dart';
 import 'package:flutter_shop/Models/addressesModel.dart';
 import 'package:flutter_shop/Models/paymentMethodsModel.dart';
 import 'package:flutter_shop/Models/userModel.dart';

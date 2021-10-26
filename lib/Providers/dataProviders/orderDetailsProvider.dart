@@ -86,10 +86,8 @@ class orderDetailsProvider with ChangeNotifier {
     order = single;
     notifyListeners();
   }
-  //getData () => allOrders;
-  getDataById (String id) {
-    String userSessionId ;
-    // userSessionId = allSessions.where((element) => element.userId == id).toList();
-    return allOrders.where((element) => element.orderId == userSessionId).toList().first;
+  getData () => allOrders;
+   getDataById (String id) {
+    return allOrders.where((element) => element.userId == id).toList();
   }
 }

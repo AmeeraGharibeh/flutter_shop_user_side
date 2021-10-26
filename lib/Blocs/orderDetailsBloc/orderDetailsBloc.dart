@@ -29,17 +29,10 @@ class OrderDetailsBloc extends Bloc<OrderDetailsEvents, OrderDetailsState> {
       try{
         var provider = Provider.of<orderDetailsProvider>(event.context, listen: false);
         ordersModel orderObj = await provider.postOrderDetails( event.userId, event.paymentId, event.totalPrice, event.quantity, event.trackingNo, event.orderStatus, event.createdAt).then((value) async{
-
           List<ordersModel> list = await provider.fetchOrderDetails();
           return provider.setData(list);
-
         });
         provider.setOne(orderObj);
-        for (var item in event.orderItem){
-          var provider = Provider.of<orderItemProvider>(event.context, listen: false);
-          orderItemModel orderItem = await provider.updateOrderItem(item.orderItemId, 'orderObj.orderId');
-          provider.setOne(orderItem);
-        }
 
         yield orderDetailsSuccess();
 
