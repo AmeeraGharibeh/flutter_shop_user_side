@@ -92,7 +92,7 @@ class shoppingCartProvider with ChangeNotifier {
   }
   getData () => allShoppingCart;
   getDataById(String id){
-    return allShoppingCart.where((element) => element.cartItemId == id).toList();
+    return allShoppingCart.singleWhere((element) => element.cartItemId == id);
   }
 
 }

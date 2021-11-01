@@ -59,7 +59,7 @@ void initState(){
           List<orderItemModel> res=[];
           List<shoppingCartModel> cart = [];
           for (var i in res){
-            var res =  cartProvider.getDataById(i.shoppingCartId);
+            var res =  cartProvider.getDataById(i.productId);
             cart.add(res);
           }
           for (var item in cart) {

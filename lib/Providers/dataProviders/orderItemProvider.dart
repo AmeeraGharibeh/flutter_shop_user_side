@@ -47,8 +47,8 @@ class orderItemProvider with ChangeNotifier {
       throw Exception('error adding data');
     }
   }
-  Future<orderItemModel> postOrderItem (String orderId, String shoppingCartId, String userId, String sessionId, String createdAt,)async {
-    var body = json.encode({'orderId': orderId, 'shoppingCartId' : shoppingCartId, 'userId': userId, 'sessionId': sessionId,  'createdAt': createdAt,});
+  Future<orderItemModel> postOrderItem (String orderId, String productId, int productPrice, String productSize, int quantity, String userId, String createdAt,)async {
+    var body = json.encode({'orderId': orderId, 'productId' : productId, 'productPrice': productPrice, 'prductSize': productSize, 'quantity': quantity,  'createdAt': createdAt,});
     var response = await http.post(apiURL + 'orderitem/addorderitem',
         headers:<String, String> {
           'Content-Type': 'application/json; charset-utf=8',
@@ -91,6 +91,6 @@ class orderItemProvider with ChangeNotifier {
   }
   getData () => allOrderItems;
   getDataById (String id) {
-    return allOrderItems.where((element) => element.shoppingCartId == id).toList();
+    return allOrderItems.where((element) => element.productId == id).toList();
   }
 }

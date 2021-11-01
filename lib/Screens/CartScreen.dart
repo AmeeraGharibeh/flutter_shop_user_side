@@ -140,6 +140,7 @@ class _cartPageState extends State<cartPage> {
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
                             width: 25,
@@ -261,7 +262,7 @@ class _cartPageState extends State<cartPage> {
                                               color: Colors.black45),
                                         ),
                                         SizedBox(
-                                          width: 10,
+                                          width: 25,
                                         ),
                                         Text(
                                           '\$'+ userProducts[i].productPrice.toString(),
@@ -278,7 +279,7 @@ class _cartPageState extends State<cartPage> {
                             ),
                           ),
                           GestureDetector(
-                            child: Icon(Icons.delete_outline),
+                            child: Icon(Icons.delete_outline, size: 28,),
                             onTap: (){
                               setState(() {
                                 userProducts.remove(snapshot.data[i]);
@@ -287,7 +288,6 @@ class _cartPageState extends State<cartPage> {
                             },
                           )
                         ],
-
                       ),
                     ),
                   );
@@ -454,10 +454,6 @@ class _cartPageState extends State<cartPage> {
                             onTap: () async{
                               orderDetailsBloc.add(addOrderDetailsButtonPressed( userId: currentUser.userId, paymentId: user.defaultPaymentCard, totalPrice: totalPrice.toString(), quantity: totalQuantity, trackingNo: '99999999', orderStatus: 'validating', createdAt: DateTime.now().toString(), context: context));
 
-                     /*         for (var item in snapshot.data){
-                                orderItemBloc.add(addOrderItemButtonPressed(orderId: '', shoppingCartId: item.cartItemId, userId: item.userId , createdAt: DateTime.now().toString(), context: context ));
-                              }
-                               orderItemBloc.add(orderItemInit(context: context));*/
                               setState(() {
                                 isAsync = !isAsync;
                               });

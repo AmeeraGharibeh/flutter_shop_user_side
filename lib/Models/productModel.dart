@@ -14,6 +14,7 @@ class productsModel {
   bool isFeatured;
   List productColors;
   List productSizes;
+  String createdAt;
   productsModel({this.productId,this.productName, this.productPic, this.productDescription, this.productCategory, this.productBrand, this.productQuantity,
     this.productPrice, this.productSale, this.isFeatured, this.productColors, this.productSizes});
 

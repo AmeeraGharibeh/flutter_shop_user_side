@@ -252,9 +252,7 @@ class _paymentCardsPageState extends State<paymentCardsPage> {
   Widget build(BuildContext context) {
     var provider = Provider.of<userProvider>(context, listen: false);
     user = provider.getData();
-    List<userPaymentCard> userCards = [];
     var cardsProvider = Provider.of<userPaymentProvider>(context, listen: false);
-    ///userCards = cardsProvider.getData();
     return Scaffold(
       backgroundColor: myColors.backGroundShade,
       appBar: AppBar(

@@ -37,106 +37,107 @@ class _favoritesPageState extends State<favoritesPage> {
 
     Widget myFavoritesList (List<favoritesModel> favList) {
       var provider = Provider.of<productsProvider>(context, listen: false);
-      for (var item in favList) {
-        return StreamBuilder(
-          stream: provider.fetchProducts().asStream(),
-          builder: (context, snapshot) {
-            switch(snapshot.connectionState){
-              case ConnectionState.waiting: return Center(child: CircularProgressIndicator(),);
-              default: if(snapshot.hasError){
-                return Text('Please Wait....');
-              }else {
-                List<productsModel> usersFavorites = snapshot.data.where((element) => element.productId == item.productId).toList();
-                return  ListView.builder(
-                  itemCount: usersFavorites.length,
-                  itemBuilder: (context, i) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5,),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width-100,
-                        padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            color: Colors.white
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              width: 90,
-                              height: 110,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ usersFavorites[i].productPic.first,), fit: BoxFit.cover)
-                              ),
-                            ),
-                            // SizedBox(width: 7,),
-                            Container(
-                              padding: EdgeInsets.only(top: 10),
-                              height: 130,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(usersFavorites[i].productName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),),
-                                  Text('oooo', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.grey),),
-                                  SizedBox(height: 5,),
-                                  Text('\$' + usersFavorites[i].productPrice.toString(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: myColors.lightOrange),),
-                                  SizedBox(height: 10,),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 4),
-                                        width: 65,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey, width: 1),
-                                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                                        ),
-                                        child: Center(child: Text ('Size')),
-                                      ),
-                                      SizedBox(width: 10,),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 4),
-                                        width: 75,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          color: myColors.lightOrange,
-                                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                                        ),
-                                        child: Center(child: Text('Buy Now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),)),
-
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                                width: 25,
-                                height: 25,
-                                child: GestureDetector(
-                                  onTap: () async{
-                                    favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favList[i].favoriteItemId, context: context));
-                                  },
-                                  child: Icon(
-                                    Icons.delete_outline, color: Colors.grey,
-                                    size: 25,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-
-                );
+      return StreamBuilder(
+        stream: provider.fetchProducts().asStream(),
+        builder: (context, snapshot) {
+          switch(snapshot.connectionState){
+            case ConnectionState.waiting: return Center(child: CircularProgressIndicator(),);
+            default: if(snapshot.hasError){
+              return Text('Please Wait....');
+            }else {
+              List<productsModel> usersFavorites= [];
+              for (var item in favList) {
+                var res = snapshot.data.where((element) => element.productId == item.productId);
+                usersFavorites.addAll(res);
               }
-            }
-          },
-        );
-      }
+              return  ListView.builder(
+                itemCount: usersFavorites.length,
+                itemBuilder: (context, i) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5,),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width-100,
+                      padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Colors.white
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            width: 90,
+                            height: 110,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                image: DecorationImage(image: NetworkImage('http://192.168.1.39:4000/'+ usersFavorites[i].productPic.first,), fit: BoxFit.cover)
+                            ),
+                          ),
+                          // SizedBox(width: 7,),
+                          Container(
+                            padding: EdgeInsets.only(top: 10),
+                            height: 130,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(usersFavorites[i].productName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),),
+                                Text('oooo', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.grey),),
+                                SizedBox(height: 5,),
+                                Text('\$' + usersFavorites[i].productPrice.toString(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: myColors.lightOrange),),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 4),
+                                      width: 65,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey, width: 1),
+                                        borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      ),
+                                      child: Center(child: Text ('Size')),
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 4),
+                                      width: 75,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: myColors.lightOrange,
+                                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                                      ),
+                                      child: Center(child: Text('Buy Now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),)),
 
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                              width: 25,
+                              height: 25,
+                              child: GestureDetector(
+                                onTap: () async{
+                                  favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: favList[i].favoriteItemId, context: context));
+                                },
+                                child: Icon(
+                                  Icons.delete_outline, color: Colors.grey,
+                                  size: 25,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+
+              );
+            }
+          }
+        },
+      );
     }
 
     Widget favoritesUI (BuildContext context){

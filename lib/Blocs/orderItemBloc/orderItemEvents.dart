@@ -13,12 +13,14 @@ class orderItemInit extends OrderItemEvents {
 }
 class addOrderItemButtonPressed extends OrderItemEvents {
   String orderId;
-  String shoppingCartId;
+  String productId;
+  int productPrice;
+  String productSize;
+  int quantity;
   String userId;
-  String sessionId;
   String createdAt;
   BuildContext context;
-  addOrderItemButtonPressed({ this.orderId, this.shoppingCartId, this.userId, this.sessionId, this.createdAt, this.context});
+  addOrderItemButtonPressed({ this.orderId,  this.productId, this.productPrice, this.productSize, this.quantity, this.userId, this.createdAt, this.context});
 }
 class updateOrderItemButtonPresses extends OrderItemEvents {
   String id;

@@ -66,7 +66,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
   int quantity = 0;
   String selectedSize;
   List<favoritesModel> fav;
-
+  var favProvider;
 
   @override
   void initState() {
@@ -76,14 +76,8 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
     shoppingCartBloc = BlocProvider.of<ShoppingCartBloc>(context);
     var provider = Provider.of<userProvider>(context, listen: false);
     user = provider.getData();
-    var favProvider = Provider.of<favoritesProvider>(context, listen: false);
-    if (favProvider.getUserFavs(productId, user.userId).isNotEmpty){
-      thisItem = favProvider.getUserFavs(productId, user.userId).first.favoriteItemId ;
-      isFavorite = true;
-    }else {
-        thisItem = '';
-        isFavorite = false;
-    }
+     favProvider = Provider.of<favoritesProvider>(context, listen: false);
+
   }
 
   @override
@@ -125,7 +119,6 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                 for (var singleColor in productData.productColors) {
                   colors.add(colorItem.fromJson(json.decode(singleColor)));
                 }
-
                 return Stack(
                   children: [
                     SingleChildScrollView(
@@ -136,7 +129,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                               Container(
                                 color: myColors.dustyOrange,
                                 width: MediaQuery.of(context).size.width,
-                                height: MediaQuery.of(context).size.height * 0.90,
+                                height: MediaQuery.of(context).size.height * 0.75,
                                 child: PageView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: imgs.length,
@@ -177,42 +170,58 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                             color: Colors.black45,),
                                         )
                                     ),
-                                    Container(
-                                        width: 35,
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.black45,
-                                              width: 0.7,
-                                            )
-                                        ),
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            setState(() {
-                                              isFavorite = !isFavorite;
-                                            });
-                                            if(isFavorite == false) {
+                                    StreamBuilder(
+                                      stream: favProvider.fetchFavorites().asStream(),
+                                      builder: (context, snapshot) {
+                                        if(!snapshot.hasData) {
+                                          return CircularProgressIndicator();
+                                        } else {
+                                         List<favoritesModel> favs =[] ;
+                                          favs = snapshot.data;
+                                         var res = favs.any((element) => element.userId == user.userId  && element.productId == productId);
+                                          if (res){
+                                            isFavorite = true;
+                                            thisItem = favs.singleWhere((element) =>  element.userId == user.userId  && element.productId == productId).favoriteItemId ?? null;
+                                          }
+                                          else {
+                                            isFavorite = false;
+                                          }
+                                          return Container(
+                                              width: 35,
+                                              height: 35,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.black45,
+                                                    width: 0.7,
+                                                  )
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: () async {
+                                                  setState(() {
+                                                    isFavorite = !isFavorite;
+                                                  });
+                                                  if(isFavorite == false) {
+                                                    favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: thisItem, context: context));
+                                                  } else {
+                                                    favoritesBloc.add(addToFavoritesButtonPressed(userId: user.userId, productId: productData.productId, context: context));
+                                                  }
+                                                },
+                                                child: Icon(
+                                                  isFavorite ?  Icons.favorite : Icons.favorite_border,
+                                                  color: Colors.redAccent,),
+                                              )
+                                          );
+                                        }
 
-                                              favoritesBloc.add(addToFavoritesButtonPressed(userId: user.userId, productId: productData.productId, context: context));
-
-                                            } else {
-                                              print('item id: '+ thisItem );
-                                              favoritesBloc.add(removeFromFavoritesButtonPressed(itemId: thisItem, context: context));
-
-                                            }
-                                          },
-                                          child: Icon(
-                                            isFavorite ?  Icons.favorite : Icons.favorite_border,
-                                            color: Colors.redAccent,),
-                                        )
+                                      }
                                     ),
                                   ],
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(top: 500,),
+                                padding: const EdgeInsets.only(top: 530,),
                                 child: Container(
                                     padding: const EdgeInsets.only(
                                         top: 30, left: 15, right: 15),
@@ -333,8 +342,7 @@ class _productDetailsPageState extends State<productDetailsPage> with SingleTick
                                         Container(
                                           width: MediaQuery.of(context).size.width,
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment
-                                                .start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               myTabs(),
                                               Container(

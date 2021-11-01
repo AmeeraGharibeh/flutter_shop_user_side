@@ -31,19 +31,49 @@ class productsProvider with ChangeNotifier {
   getDataById (String productid) {
     return allProducts.where((element) => element.productId == productid).toList();
   }
-  getDataByFilter (List colors, List sizes, List brands) {
+
+  getDataByFilter (List<productsModel> products, List colors, List sizes, List brands, int min, int max) {
     List<productsModel> filteredItems = [];
+    var res = products.where((element) => element.productPrice>min && element.productPrice<max).toList();
+    filteredItems.addAll(res);
     for (var item in colors) {
-      var res = allProducts.where((element) => element.productColors.any((element) => element.contains(item))).toList();
+      var res = products.where((element) => element.productColors.any((element) => element.contains(item))).toList();
       filteredItems.addAll(res);
     }
     for (String item in sizes) {
-      var res = allProducts.where((element) => element.productSizes.any((element) => element.contains(item.toUpperCase()))).toList();
+      var res = products.where((element) => element.productSizes.any((element) => element.contains(item.toUpperCase()))).toList();
       filteredItems.addAll(res);
     }
     for (String brand in brands){
-      var res = allProducts.where((element) => element.productBrand.toLowerCase().contains(brand.toLowerCase())).toList();
+      var res = products.where((element) => element.productBrand.toLowerCase().contains(brand.toLowerCase())).toList();
       filteredItems.addAll(res);
+    }
+    return filteredItems;
+  }
+  getDataBySortBy (List<productsModel> products, String index) {
+    List<productsModel> filteredItems = [];
+    filteredItems = products;
+    switch(index){
+      case 'price: lowest to high':
+        filteredItems.sort((a,b){
+          var aDate = a.productPrice;
+          var bDate = b.productPrice;
+          return aDate.compareTo(bDate);
+        });
+        break;
+      case 'price: highest to low' :
+        filteredItems.sort((a,b){
+          var aDate = a.productPrice;
+          var bDate = b.productPrice;
+          return bDate.compareTo(aDate);
+        });
+        break;
+      case 'Newest' :
+        filteredItems.sort((a,b){
+          var aDate = a.createdAt;
+          var bDate = b.createdAt;
+          return bDate.compareTo(aDate);
+        });
     }
     return filteredItems;
   }

@@ -306,7 +306,8 @@ class _paymentPageState extends State<paymentPage> {
                       GestureDetector(
                         onTap: (){
                           for (var item in cartList){
-                            orderItemBloc.add(addOrderItemButtonPressed(orderId: userOrder.first.orderId, shoppingCartId: item.cartItemId, userId: item.userId , createdAt: DateTime.now().toString(), context: context ));
+                            orderItemBloc.add(addOrderItemButtonPressed(orderId: userOrder.first.orderId, productId: item.productId, productPrice: item.productPrice,
+                                productSize: item.productSize, quantity: item.quantity, userId: item.userId , createdAt: DateTime.now().toString(), context: context ));
                           }
                           setState(() {
                             isAsync = !isAsync;

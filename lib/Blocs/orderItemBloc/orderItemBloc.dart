@@ -28,7 +28,7 @@ class OrderItemBloc extends Bloc<OrderItemEvents, OrderItemState> {
       yield orderItemLoading();
       try{
         var provider = Provider.of<orderItemProvider>(event.context, listen: false);
-        orderItemModel orderObj = await provider.postOrderItem(event.orderId, event.shoppingCartId, event.userId, event.sessionId, event.createdAt).then((value) async{
+        orderItemModel orderObj = await provider.postOrderItem(event.orderId, event.productId, event.productPrice, event.productSize, event.quantity, event.userId, event.createdAt).then((value) async{
           List<orderItemModel> ordersList =await provider.fetchOrderItem();
         return provider.setData(ordersList);
         });
